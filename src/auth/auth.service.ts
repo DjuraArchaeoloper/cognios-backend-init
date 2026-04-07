@@ -20,11 +20,14 @@ import { User, UserDocument } from "./schemas/user.schema";
 
 @Injectable()
 export class AuthService {
-  constructor(@InjectModel(User.name) private readonly userModel: Model<User>) {}
+  constructor(
+    @InjectModel(User.name) private readonly userModel: Model<User>,
+  ) {}
 
   private readonly sessionCookieName = "cognios_session";
   private readonly sessionMaxAgeSec = 7 * 24 * 60 * 60;
-  private readonly emailFrom = process.env.EMAIL_FROM ?? "onboarding@resend.dev";
+  private readonly emailFrom =
+    process.env.EMAIL_FROM ?? "onboarding@resend.dev";
 
   private get authSecret(): string | null {
     const secret = process.env.AUTH_SECRET;
@@ -50,7 +53,9 @@ export class AuthService {
 
   private decodePayload<T>(payloadB64: string): T | null {
     try {
-      return JSON.parse(Buffer.from(payloadB64, "base64url").toString("utf8")) as T;
+      return JSON.parse(
+        Buffer.from(payloadB64, "base64url").toString("utf8"),
+      ) as T;
     } catch {
       return null;
     }
@@ -58,7 +63,9 @@ export class AuthService {
 
   signToken(data: object, secret: string): string {
     const payload = this.encodePayload(data);
-    const sig = createHmac("sha256", secret).update(payload).digest("base64url");
+    const sig = createHmac("sha256", secret)
+      .update(payload)
+      .digest("base64url");
     return `${payload}.${sig}`;
   }
 
@@ -80,13 +87,18 @@ export class AuthService {
     if (!timingSafeEqual(sigBuf, expected)) return null;
 
     const data = this.decodePayload<T>(payloadB64);
-    if (!data || typeof (data as { exp?: unknown }).exp !== "number") return null;
+    if (!data || typeof (data as { exp?: unknown }).exp !== "number")
+      return null;
     const now = Math.floor(Date.now() / 1000);
     if (now > (data as { exp: number }).exp) return null;
     return data;
   }
 
-  buildSessionToken(userId: string, email: string | undefined, secret: string): string {
+  buildSessionToken(
+    userId: string,
+    email: string | undefined,
+    secret: string,
+  ): string {
     const payload: SessionTokenPayload = {
       typ: "session",
       sub: userId,
@@ -137,7 +149,7 @@ export class AuthService {
   async findUserById(id: string): Promise<UserDocument | null> {
     const oid = this.parseObjectId(id);
     if (!oid) return null;
-    return this.userModel.findById(oid).exec();
+    return await this.userModel.findById(oid).exec();
   }
 
   toSessionUserDto(doc: UserDocument): SessionUserDto {
@@ -166,7 +178,8 @@ export class AuthService {
       existing.lastLoginAt = t;
       existing.updatedAt = t;
       existing.role = RoleName.CREATOR;
-      if (!existing.accountStatus) existing.accountStatus = AccountStatus.ACTIVE;
+      if (!existing.accountStatus)
+        existing.accountStatus = AccountStatus.ACTIVE;
       await existing.save();
       return existing;
     }
@@ -190,12 +203,15 @@ export class AuthService {
   }
 
   async upsertLearnerWallet(
-    walletAddress: string
-  ): Promise<{ ok: true; user: UserDocument } | { ok: false; reason: "creator_wallet" }> {
+    walletAddress: string,
+  ): Promise<
+    { ok: true; user: UserDocument } | { ok: false; reason: "creator_wallet" }
+  > {
     const t = this.now();
     const existing = await this.userModel.findOne({ walletAddress }).exec();
     if (existing) {
-      if (existing.role === RoleName.CREATOR) return { ok: false, reason: "creator_wallet" };
+      if (existing.role === RoleName.CREATOR)
+        return { ok: false, reason: "creator_wallet" };
       existing.lastSeenAt = t;
       existing.updatedAt = t;
       existing.role = RoleName.LEARNER;
@@ -221,11 +237,13 @@ export class AuthService {
 
   async linkWalletToUser(
     userId: string,
-    walletAddress: string
+    walletAddress: string,
   ): Promise<{ ok: true } | { ok: false; reason: "in_use" | "not_found" }> {
     const oid = this.parseObjectId(userId);
     if (!oid) return { ok: false, reason: "not_found" };
-    const other = await this.userModel.findOne({ walletAddress, _id: { $ne: oid } }).exec();
+    const other = await this.userModel
+      .findOne({ walletAddress, _id: { $ne: oid } })
+      .exec();
     if (other) return { ok: false, reason: "in_use" };
     const res = await this.userModel
       .updateOne(
@@ -237,7 +255,7 @@ export class AuthService {
             walletVerified: true,
             updatedAt: this.now(),
           },
-        }
+        },
       )
       .exec();
     if (res.matchedCount === 0) return { ok: false, reason: "not_found" };
@@ -253,12 +271,20 @@ export class AuthService {
     return line.replace(/^Token:\s*/i, "").trim() || null;
   }
 
-  verifySolanaSignature(messageUtf8: string, signatureBase58: string, walletAddress: string): boolean {
+  verifySolanaSignature(
+    messageUtf8: string,
+    signatureBase58: string,
+    walletAddress: string,
+  ): boolean {
     try {
       const pubkey = new PublicKey(walletAddress);
       const signature = bs58.decode(signatureBase58);
       const messageBytes = new TextEncoder().encode(messageUtf8);
-      return nacl.sign.detached.verify(messageBytes, signature, pubkey.toBytes());
+      return nacl.sign.detached.verify(
+        messageBytes,
+        signature,
+        pubkey.toBytes(),
+      );
     } catch {
       return false;
     }
@@ -298,35 +324,67 @@ export class AuthService {
     message: string,
     walletAddress: string,
     userId: string,
-    secret: string
+    secret: string,
   ): boolean {
     const embedded = this.extractTokenFromMessage(message);
     if (!embedded) return false;
     const payload = this.verifyToken<WalletLinkTokenPayload>(embedded, secret);
     const tokenSub = typeof payload?.sub === "string" ? payload.sub.trim() : "";
-    const tokenWallet = typeof payload?.wallet === "string" ? payload.wallet.trim() : "";
-    return Boolean(payload && payload.typ === "wallet_link" && tokenSub === userId.trim() && tokenWallet === walletAddress);
+    const tokenWallet =
+      typeof payload?.wallet === "string" ? payload.wallet.trim() : "";
+    return Boolean(
+      payload &&
+      payload.typ === "wallet_link" &&
+      tokenSub === userId.trim() &&
+      tokenWallet === walletAddress,
+    );
   }
 
-  validateLearnerToken(message: string, walletAddress: string, secret: string): boolean {
+  validateLearnerToken(
+    message: string,
+    walletAddress: string,
+    secret: string,
+  ): boolean {
     const embedded = this.extractTokenFromMessage(message);
     if (!embedded) return false;
     const payload = this.verifyToken<LearnerTokenPayload>(embedded, secret);
-    return Boolean(payload && payload.typ === "learner_wallet" && payload.wallet === walletAddress);
+    return Boolean(
+      payload &&
+      payload.typ === "learner_wallet" &&
+      payload.wallet === walletAddress,
+    );
   }
 
   async completeCreatorOnboarding(
     userId: string,
-    input: { creatorAgreementAccepted: boolean; username: string }
-  ): Promise<{ ok: true } | { ok: false; reason: "not_found" | "validation" | "username_taken"; message?: string }> {
+    input: { creatorAgreementAccepted: boolean; username: string },
+  ): Promise<
+    | { ok: true }
+    | {
+        ok: false;
+        reason: "not_found" | "validation" | "username_taken";
+        message?: string;
+      }
+  > {
     const oid = this.parseObjectId(userId);
     if (!oid) return { ok: false, reason: "not_found" };
     const username = input.username.trim().toLowerCase();
     if (!/^[a-z0-9._-]{2,32}$/.test(username)) {
-      return { ok: false, reason: "validation", message: "Invalid username format" };
+      return {
+        ok: false,
+        reason: "validation",
+        message: "Invalid username format",
+      };
     }
-    const taken = await this.userModel.findOne({ username, _id: { $ne: oid } }).exec();
-    if (taken) return { ok: false, reason: "username_taken", message: "Username is already taken" };
+    const taken = await this.userModel
+      .findOne({ username, _id: { $ne: oid } })
+      .exec();
+    if (taken)
+      return {
+        ok: false,
+        reason: "username_taken",
+        message: "Username is already taken",
+      };
     const t = this.now();
     const res = await this.userModel
       .updateOne(
@@ -338,10 +396,13 @@ export class AuthService {
             onboardingCompletedAt: t,
             updatedAt: t,
             ...(input.creatorAgreementAccepted
-              ? { creatorAgreementAccepted: true, creatorAgreementAcceptedAt: t }
+              ? {
+                  creatorAgreementAccepted: true,
+                  creatorAgreementAcceptedAt: t,
+                }
               : {}),
           },
-        }
+        },
       )
       .exec();
     if (res.matchedCount === 0) return { ok: false, reason: "not_found" };
@@ -350,8 +411,11 @@ export class AuthService {
 
   async requestEmailVerificationForUser(
     userId: string,
-    email: string
-  ): Promise<{ ok: true } | { ok: false; reason: "already_verified" | "email_taken" | "not_found" }> {
+    email: string,
+  ): Promise<
+    | { ok: true }
+    | { ok: false; reason: "already_verified" | "email_taken" | "not_found" }
+  > {
     const oid = this.parseObjectId(userId);
     if (!oid) return { ok: false, reason: "not_found" };
     const user = await this.userModel.findById(oid).exec();
@@ -359,20 +423,27 @@ export class AuthService {
     if (user.emailVerified && user.email?.toLowerCase().trim() === email) {
       return { ok: false, reason: "already_verified" };
     }
-    const taken = await this.userModel.findOne({ email, _id: { $ne: oid } }).exec();
+    const taken = await this.userModel
+      .findOne({ email, _id: { $ne: oid } })
+      .exec();
     if (taken) return { ok: false, reason: "email_taken" };
     return { ok: true };
   }
 
   async applyVerifiedEmailFromToken(
     userId: string,
-    email: string
-  ): Promise<{ ok: true; user: UserDocument } | { ok: false; reason: "mismatch" | "email_taken" | "not_found" }> {
+    email: string,
+  ): Promise<
+    | { ok: true; user: UserDocument }
+    | { ok: false; reason: "mismatch" | "email_taken" | "not_found" }
+  > {
     const oid = this.parseObjectId(userId);
     if (!oid) return { ok: false, reason: "not_found" };
     const user = await this.userModel.findById(oid).exec();
     if (!user) return { ok: false, reason: "not_found" };
-    const taken = await this.userModel.findOne({ email, _id: { $ne: oid } }).exec();
+    const taken = await this.userModel
+      .findOne({ email, _id: { $ne: oid } })
+      .exec();
     if (taken) return { ok: false, reason: "email_taken" };
     user.email = email;
     user.emailVerified = true;
@@ -381,8 +452,12 @@ export class AuthService {
     return { ok: true, user };
   }
 
-  async sendMagicLink(email: string, verifyUrl: string): Promise<{ ok: true } | { ok: false }> {
+  async sendMagicLink(
+    email: string,
+    verifyUrl: string,
+  ): Promise<{ ok: true } | { ok: false }> {
     const apiKey = process.env.RESEND_API_KEY;
+    console.log("API KEY", apiKey);
     if (!apiKey) return { ok: true };
     const resend = new Resend(apiKey);
     const { error } = await resend.emails.send({
@@ -391,12 +466,18 @@ export class AuthService {
       subject: "Sign in to Cognios (creator)",
       html: `<p>Click to sign in:</p><p><a href="${verifyUrl}">Sign in to Cognios</a></p><p>This link expires in 15 minutes.</p>`,
     });
+    console.log("ERROR", error);
     if (error) return { ok: false };
     return { ok: true };
   }
 
-  async sendVerifyEmail(email: string, verifyUrl: string): Promise<{ ok: true } | { ok: false }> {
+  async sendVerifyEmail(
+    email: string,
+    verifyUrl: string,
+  ): Promise<{ ok: true } | { ok: false }> {
+    console.log("ENTER");
     const apiKey = process.env.RESEND_API_KEY;
+    console.log(apiKey);
     if (!apiKey) return { ok: true };
     const resend = new Resend(apiKey);
     const { error } = await resend.emails.send({

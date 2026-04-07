@@ -1,15 +1,18 @@
 import { ConfigService } from "@nestjs/config";
-import sgMail from "@sendgrid/mail";
+import { Resend } from "resend";
 import { Injectable } from "@nestjs/common";
 
 @Injectable()
 export class EmailService {
   private frontendUrl: string;
   private noReplyEmail: string;
+  private resend: Resend;
 
   constructor(private configService: ConfigService) {
-    this.noReplyEmail = this.configService.get<string>("NOREPLY_EMAIL")!;
-    sgMail.setApiKey(this.configService.get<string>("SENDGRID_API_KEY")!);
+    this.noReplyEmail = this.configService.get<string>("EMAIL_FROM")!;
+    this.resend = new Resend(
+      this.configService.getOrThrow<string>("RESEND_API_KEY"),
+    );
 
     this.frontendUrl = this.configService.get<string>("FRONTEND_URL")!;
   }
@@ -78,11 +81,13 @@ export class EmailService {
         </tr>`,
     )}`;
 
-    await sgMail.send({
+    const { error } = await this.resend.emails.send({
       from: this.noReplyEmail,
       to: email,
       subject: "Refund Request Approved",
       html,
     });
+    if (error) return { ok: false, error: error.message };
+    return { ok: true };
   }
 }
