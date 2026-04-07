@@ -177,7 +177,7 @@ export class AuthService {
       existing.emailVerified = true;
       existing.lastLoginAt = t;
       existing.updatedAt = t;
-      existing.role = RoleName.CREATOR;
+      // Role is immutable after account creation. Login must never rewrite it.
       if (!existing.accountStatus)
         existing.accountStatus = AccountStatus.ACTIVE;
       await existing.save();
@@ -210,11 +210,12 @@ export class AuthService {
     const t = this.now();
     const existing = await this.userModel.findOne({ walletAddress }).exec();
     if (existing) {
-      if (existing.role === RoleName.CREATOR)
+      // Do not allow wallet-learner login to mutate role.
+      // Only originally-learner accounts can use this flow.
+      if (existing.role !== RoleName.LEARNER)
         return { ok: false, reason: "creator_wallet" };
       existing.lastSeenAt = t;
       existing.updatedAt = t;
-      existing.role = RoleName.LEARNER;
       existing.walletVerified = true;
       await existing.save();
       return { ok: true, user: existing };
@@ -457,7 +458,6 @@ export class AuthService {
     verifyUrl: string,
   ): Promise<{ ok: true } | { ok: false }> {
     const apiKey = process.env.RESEND_API_KEY;
-    console.log("API KEY", apiKey);
     if (!apiKey) return { ok: true };
     const resend = new Resend(apiKey);
     const { error } = await resend.emails.send({
@@ -475,9 +475,7 @@ export class AuthService {
     email: string,
     verifyUrl: string,
   ): Promise<{ ok: true } | { ok: false }> {
-    console.log("ENTER");
     const apiKey = process.env.RESEND_API_KEY;
-    console.log(apiKey);
     if (!apiKey) return { ok: true };
     const resend = new Resend(apiKey);
     const { error } = await resend.emails.send({

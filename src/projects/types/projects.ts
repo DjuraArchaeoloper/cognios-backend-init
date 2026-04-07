@@ -8,6 +8,7 @@ export interface ProjectInterface {
   creatorWallet: string;
   category: Types.ObjectId;
   subcategory: Types.ObjectId;
+  projectType: PROJECT_TYPE;
   status: PROJECT_STATUS;
   price: number;
   media: Media;
@@ -28,6 +29,10 @@ export enum PROJECT_STATUS {
   PUBLISHED = "published",
   FLAGGED = "flagged",
   DELETED = "deleted",
+}
+
+export enum PROJECT_TYPE {
+  VIDEO = "video",
 }
 
 export interface Media {

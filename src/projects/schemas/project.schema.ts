@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, Types } from "mongoose";
-import { DIFFICULTY, PROJECT_STATUS } from "../types/projects";
+import { DIFFICULTY, PROJECT_STATUS, PROJECT_TYPE } from "../types/projects";
 
 export type ProjectDocument = Project & Document;
 
@@ -75,6 +75,14 @@ export class Project {
     index: true,
   })
   subcategory: Types.ObjectId;
+
+  @Prop({
+    type: String,
+    enum: Object.values(PROJECT_TYPE),
+    required: true,
+    default: PROJECT_TYPE.VIDEO,
+  })
+  projectType: PROJECT_TYPE;
 
   @Prop({
     type: String,

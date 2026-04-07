@@ -44,10 +44,10 @@ export class EmailService {
               <tr>
                 <td style="padding: 24px 0px; text-align: center; border-top: 1px solid #e2e2e2;">
                   <p style="color: #9c9c9c; font-size: 12px; margin: 0 0 8px 0;">
-                    Need help? Contact us at <a href="mailto:support@mystorapp.com" style="color: #5b6f5a; text-decoration: none;">support@mystorapp.com</a>
+                    Need help? Contact us at <a href="mailto:support@cognios.io" style="color: #5b6f5a; text-decoration: none;">support@cognios.io</a>
                   </p>
                   <p style="color: #9c9c9c; font-size: 12px; margin: 0;">
-                    © ${new Date().getFullYear()} Mystor. All rights reserved.
+                    © ${new Date().getFullYear()} Cognios. All rights reserved.
                   </p>
                 </td>
               </tr>

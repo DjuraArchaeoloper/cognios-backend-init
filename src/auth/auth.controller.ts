@@ -41,22 +41,17 @@ export class AuthController {
 
   @Post("request-link")
   async requestLink(@Req() req: Request, @Body() body: { email?: string }) {
-    console.log("ENTER ENTER");
     const secret = this.authService.getSecretOrNull();
-    console.log("SECRET", secret);
     if (!secret)
       throw new InternalServerErrorException("AUTH_SECRET is not configured");
     const email =
       typeof body.email === "string" ? body.email.toLowerCase().trim() : "";
 
-    console.log("EMAIL", email);
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       throw new BadRequestException("Invalid email");
     }
     const token = this.authService.buildMagicToken(email, secret);
-    console.log("TOKEN", token);
     const verifyUrl = `${this.appBase(req)}/auth/verify?token=${encodeURIComponent(token)}`;
-    console.log("VERIFY URL", verifyUrl);
     const sent = await this.authService.sendMagicLink(email, verifyUrl);
     if (!sent.ok)
       throw new InternalServerErrorException("Failed to send email");
