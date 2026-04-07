@@ -7,7 +7,7 @@ export enum InternalPurchaseStatus {
 export interface PurchaseInterface {
   _id: string;
   userId: string;
-  guideId: string;
+  projectId: string;
   creatorId: string;
   price: number;
   currency: string;
@@ -45,9 +45,9 @@ export interface CreatorEarnings {
   creatorId: string;
   earnings: number;
   price: number;
-  guideTitle: string;
-  guideSlug: string;
-  guideCurrency: string;
+  projectTitle: string;
+  projectSlug: string;
+  projectCurrency: string;
   internalStatus: string;
   createdAt: Date | null;
 }
@@ -60,14 +60,14 @@ export interface UserPaymentsResponse {
 export interface UserPayments {
   _id: string;
   price: number;
-  guideTitle: string;
-  guideSlug: string;
-  guideCurrency: string;
+  projectTitle: string;
+  projectSlug: string;
+  projectCurrency: string;
   internalStatus: string;
   createdAt: Date | null;
 }
 
-export interface GuidesEligibleForRefundResponse {
+export interface ProjectsEligibleForRefundResponse {
   _id: string;
   title: string;
   purchaseId: string;

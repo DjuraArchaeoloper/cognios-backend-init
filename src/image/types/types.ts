@@ -1,5 +1,5 @@
 export enum IMAGE_PURPOSE {
-  GUIDE_IMAGE = "guide-image",
+  PROJECT_IMAGE = "project-image",
   PROFILE_AVATAR = "profile-avatar",
   CATEGORY_ICON = "category-icon",
 }

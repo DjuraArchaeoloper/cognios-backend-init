@@ -37,7 +37,7 @@ export class ImageMedia {
   status: IMAGE_STATUS;
 
   @Prop({ type: Types.ObjectId, index: true })
-  guideId?: Types.ObjectId;
+  projectId?: Types.ObjectId;
 
   @Prop({ type: Date, index: true })
   expiresAt?: Date;

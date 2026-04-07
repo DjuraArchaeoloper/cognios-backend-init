@@ -41,12 +41,12 @@ export class PurchasesController {
     };
   }
 
-  @Get("check-if-guide-purchased/:guideId")
+  @Get("check-if-project-purchased/:projectId")
   @HttpCode(HttpStatus.OK)
-  async checkIfGuidePurchased(@Param("guideId") guideId: string) {
-    if (!guideId) throw new BadRequestException("No guide provided");
+  async checkIfProjectPurchased(@Param("projectId") projectId: string) {
+    if (!projectId) throw new BadRequestException("No project provided");
 
-    const data = await this.purchasesService.checkIfGuidePurchased(guideId);
+    const data = await this.purchasesService.checkIfProjectPurchased(projectId);
 
     return {
       success: true,
@@ -113,13 +113,13 @@ export class PurchasesController {
   @UseGuards(InternalAuthGuard)
   async markVideoPlaybackInitiated(
     @Request() req,
-    @Body() body: { guideId: string; videoPlaybackUrl: string },
+    @Body() body: { projectId: string; videoPlaybackUrl: string },
   ) {
     const userId = getUserId(req);
 
     const result = await this.purchasesService.markVideoPlaybackInitiated(
       userId,
-      body.guideId,
+      body.projectId,
       body.videoPlaybackUrl,
     );
 
@@ -132,12 +132,12 @@ export class PurchasesController {
   @Post("eligible-for-refund")
   @HttpCode(HttpStatus.OK)
   @UseGuards(InternalAuthGuard)
-  async getGuidesEligibleForRefund(@Request() req) {
+  async getProjectsEligibleForRefund(@Request() req) {
     const userId = getUserId(req);
     if (!userId) throw new BadRequestException("No user provided");
-    const guides =
-      await this.purchasesService.getGuidesEligibleForRefund(userId);
-    return { success: true, data: guides };
+    const projects =
+      await this.purchasesService.getProjectsEligibleForRefund(userId);
+    return { success: true, data: projects };
   }
 
   @UseGuards(InternalAuthGuard)
@@ -156,14 +156,14 @@ export class PurchasesController {
   @HttpCode(HttpStatus.OK)
   async getPurchaseAccessInternal(
     @Query("userId") userId: string,
-    @Query("guideId") guideId: string,
+    @Query("projectId") projectId: string,
   ) {
-    if (!userId || !guideId)
-      throw new BadRequestException("userId and guideId are required");
+    if (!userId || !projectId)
+      throw new BadRequestException("userId and projectId are required");
 
     const result = await this.purchasesService.getPurchaseAccessInternal(
       userId,
-      guideId,
+      projectId,
     );
 
     return {

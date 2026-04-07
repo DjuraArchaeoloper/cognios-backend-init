@@ -18,7 +18,7 @@ export class Purchase {
     required: true,
     index: true,
   })
-  guideId: MongooseSchema.Types.ObjectId;
+  projectId: MongooseSchema.Types.ObjectId;
 
   @Prop({
     type: MongooseSchema.Types.ObjectId,
@@ -106,7 +106,7 @@ PurchaseSchema.index(
 );
 
 PurchaseSchema.index(
-  { userId: 1, guideId: 1 },
+  { userId: 1, projectId: 1 },
   {
     unique: true,
     partialFilterExpression: { refunded: false },

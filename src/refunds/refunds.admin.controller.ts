@@ -21,12 +21,12 @@ export class RefundsAdminController {
     @Body()
     body: {
       userId: string;
-      guideId: string | undefined;
+      projectId: string | undefined;
       adminMessage?: string;
     },
   ) {
-    if (!body.userId || !body.guideId)
-      throw new BadRequestException("userId and guideId are required");
+    if (!body.userId || !body.projectId)
+      throw new BadRequestException("userId and projectId are required");
 
     if (!refundId) throw new BadRequestException("refundId is required");
 
@@ -36,7 +36,7 @@ export class RefundsAdminController {
 
     const result = await this.refundsService.approveRefund(
       body.userId,
-      body.guideId,
+      body.projectId,
       refundId,
       adminMessage,
     );

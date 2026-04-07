@@ -1,5 +1,5 @@
 export enum FILE_PURPOSE {
-  GUIDE_PDF = "guide-pdf",
+  PROJECT_PDF = "project-pdf",
 }
 
 export enum FILE_STATUS {

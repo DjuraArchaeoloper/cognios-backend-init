@@ -24,7 +24,7 @@ export class FileMedia {
     type: String,
     required: true,
     enum: Object.values(FILE_PURPOSE),
-    default: FILE_PURPOSE.GUIDE_PDF,
+    default: FILE_PURPOSE.PROJECT_PDF,
   })
   purpose: FILE_PURPOSE;
 
@@ -38,7 +38,7 @@ export class FileMedia {
   status: FILE_STATUS;
 
   @Prop({ type: Types.ObjectId, index: true })
-  guideId?: Types.ObjectId;
+  projectId?: Types.ObjectId;
 
   @Prop({ type: Date, index: true })
   expiresAt?: Date;

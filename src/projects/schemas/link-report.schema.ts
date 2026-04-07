@@ -1,10 +1,10 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, Types } from "mongoose";
 import {
-  GuideLinkReportReason,
-  GuideLinkReportStatus,
-  GuideLinkType,
-} from "../types/guides";
+  ProjectLinkReportReason,
+  ProjectLinkReportStatus,
+  ProjectLinkType,
+} from "../types/projects";
 
 export type LinkReportDocument = LinkReport & Document;
 
@@ -13,16 +13,16 @@ export class LinkReport {
   @Prop({ type: Types.ObjectId, required: true })
   linkItemId: Types.ObjectId;
 
-  @Prop({ type: String, enum: GuideLinkType, required: true })
-  linkType: GuideLinkType;
+  @Prop({ type: String, enum: ProjectLinkType, required: true })
+  linkType: ProjectLinkType;
 
   @Prop({
     type: Types.ObjectId,
-    ref: "Guide",
+    ref: "Project",
     required: true,
     index: true,
   })
-  guideId: Types.ObjectId;
+  projectId: Types.ObjectId;
 
   @Prop({
     type: Types.ObjectId,
@@ -37,23 +37,23 @@ export class LinkReport {
 
   @Prop({
     type: String,
-    enum: Object.values(GuideLinkReportReason),
+    enum: Object.values(ProjectLinkReportReason),
     required: true,
   })
-  reason: GuideLinkReportReason;
+  reason: ProjectLinkReportReason;
 
   @Prop({ default: Date.now, index: true })
   reportedAt: Date;
 
   @Prop({
     index: true,
-    enum: Object.values(GuideLinkReportStatus),
+    enum: Object.values(ProjectLinkReportStatus),
     required: true,
-    default: GuideLinkReportStatus.PENDING,
+    default: ProjectLinkReportStatus.PENDING,
   })
-  status: GuideLinkReportStatus;
+  status: ProjectLinkReportStatus;
 }
 
 export const LinkReportSchema = SchemaFactory.createForClass(LinkReport);
 
-LinkReportSchema.index({ guideId: 1, linkItemId: 1, status: 1 });
+LinkReportSchema.index({ projectId: 1, linkItemId: 1, status: 1 });

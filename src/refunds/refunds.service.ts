@@ -69,7 +69,7 @@ export class RefundsService {
 
   async approveRefund(
     userId: string,
-    guideId: string,
+    projectId: string,
     refundId: string,
     adminMessage: string,
   ): Promise<{
@@ -78,7 +78,7 @@ export class RefundsService {
   }> {
     const purchase = await this.purchasesService.getPurchaseAccessInternal(
       userId,
-      guideId,
+      projectId,
     );
     if (!purchase || !purchase.purchase)
       throw new NotFoundException("Purchase not found");
@@ -93,7 +93,7 @@ export class RefundsService {
 
     const existingRefund = await this.refundModel.findOne({
       userId,
-      guideId,
+      projectId,
       supportRequestId: refundId,
     });
 
@@ -112,7 +112,7 @@ export class RefundsService {
 
       const newRefund = await this.refundModel.create({
         userId: new Types.ObjectId(userId),
-        guideId: new Types.ObjectId(guideId),
+        projectId: new Types.ObjectId(projectId),
         supportRequestId: new Types.ObjectId(refundId),
         purchaseId: new Types.ObjectId(purchase.purchase?._id),
         adminMessage,
@@ -138,13 +138,13 @@ export class RefundsService {
     }
   }
 
-  async getRefundByPurchaseAndGuideId(
+  async getRefundByPurchaseAndProjectId(
     purchaseId: string,
-    guideId: string,
+    projectId: string,
   ): Promise<RefundDocument | null> {
     return await this.refundModel.findOne({
       purchaseId: new Types.ObjectId(purchaseId),
-      guideId: new Types.ObjectId(guideId),
+      projectId: new Types.ObjectId(projectId),
     });
   }
 }

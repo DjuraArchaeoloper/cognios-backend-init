@@ -19,7 +19,7 @@ export class InternalImageService {
       providerUid: dto.providerUid,
       purpose: dto.purpose,
       status: IMAGE_STATUS.TEMP,
-      guideId: dto.guideId ? new Types.ObjectId(dto.guideId) : undefined,
+      projectId: dto.projectId ? new Types.ObjectId(dto.projectId) : undefined,
       expiresAt: null,
     });
 

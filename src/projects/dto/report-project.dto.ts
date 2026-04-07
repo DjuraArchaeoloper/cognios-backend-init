@@ -1,11 +1,11 @@
 import { IsString, IsNotEmpty, IsEnum, IsOptional } from "class-validator";
-import { GuideReportReason } from "../types/guides";
+import { ProjectReportReason } from "../types/projects";
 
-export class ReportGuideDto {
+export class ReportProjectDto {
   @IsString()
   @IsNotEmpty()
-  @IsEnum(GuideReportReason)
-  reason: GuideReportReason;
+  @IsEnum(ProjectReportReason)
+  reason: ProjectReportReason;
 
   @IsOptional()
   @IsString()

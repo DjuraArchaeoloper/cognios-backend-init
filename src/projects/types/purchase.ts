@@ -1,7 +1,7 @@
 export interface PurchaseInterface {
   _id: string;
   userId: string;
-  guideId: string;
+  projectId: string;
   creatorId: string;
   price: number;
   currency: string;

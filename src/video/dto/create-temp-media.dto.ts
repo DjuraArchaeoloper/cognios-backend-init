@@ -22,5 +22,5 @@ export class CreateTempVideoDto {
 
   @IsMongoId()
   @IsOptional()
-  guideId?: string;
+  projectId?: string;
 }

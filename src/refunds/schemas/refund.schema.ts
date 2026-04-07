@@ -17,7 +17,7 @@ export class Refund {
     required: true,
     index: true,
   })
-  guideId: Types.ObjectId;
+  projectId: Types.ObjectId;
 
   @Prop({
     type: String,

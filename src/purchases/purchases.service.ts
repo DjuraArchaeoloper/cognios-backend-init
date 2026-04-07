@@ -17,7 +17,7 @@ import { Purchase, PurchaseDocument } from "./schemas/purchase.schema";
 import {
   CreatorEarnings,
   CreatorEarningsResponse,
-  GuidesEligibleForRefundResponse,
+  ProjectsEligibleForRefundResponse,
   InternalPurchaseStatus,
   PurchaseInterface,
   UserPayments,
@@ -29,13 +29,13 @@ import {
   SystemSettings,
   SystemSettingsDocument,
 } from "./schemas/system-settings";
-import { GUIDE_STATUS } from "src/guides/types/guides";
-import { convertLamportsToSol } from "src/guides/utils/pricing";
+import { PROJECT_STATUS } from "src/projects/types/projects";
+import { convertLamportsToSol } from "src/projects/utils/pricing";
 
 @Injectable()
 export class PurchasesService implements OnModuleInit {
   private readonly logger = new Logger(PurchasesService.name);
-  private readonly guidesServiceUrl: string;
+  private readonly projectsServiceUrl: string;
   private readonly authServiceUrl: string;
 
   constructor(
@@ -48,8 +48,8 @@ export class PurchasesService implements OnModuleInit {
     @Inject(forwardRef(() => RefundsService))
     private refundsService: RefundsService,
   ) {
-    this.guidesServiceUrl =
-      this.configService.get<string>("GUIDES_SERVICE_URL") || "";
+    this.projectsServiceUrl =
+      this.configService.get<string>("PROJECTS_SERVICE_URL") || "";
     this.authServiceUrl =
       this.configService.get<string>("AUTH_SERVICE_URL") || "";
   }
@@ -131,7 +131,7 @@ export class PurchasesService implements OnModuleInit {
     } else throw new Error(`Failed to fetch user data for userId ${userId}`);
   }
 
-  private async getGuideForPurchase(guideId: string): Promise<{
+  private async getProjectForPurchase(projectId: string): Promise<{
     _id: string;
     price: number;
     currency: string;
@@ -139,11 +139,11 @@ export class PurchasesService implements OnModuleInit {
     mainCreator: string;
     title: string;
     slug: string;
-    status: GUIDE_STATUS;
+    status: PROJECT_STATUS;
     error?: string;
     media: {
       thumbnailId: string;
-      guideFile?: {
+      projectFile?: {
         fileKey: string;
       };
     };
@@ -153,7 +153,7 @@ export class PurchasesService implements OnModuleInit {
     );
     const response = await firstValueFrom(
       this.httpService.get(
-        `${this.guidesServiceUrl}/guides/${guideId}/internal`,
+        `${this.projectsServiceUrl}/projects/${projectId}/internal`,
         {
           headers: {
             "x-internal-secret": internalSecret,
@@ -171,8 +171,8 @@ export class PurchasesService implements OnModuleInit {
         mainCreator: "",
         title: "",
         slug: "",
-        status: GUIDE_STATUS.DRAFT,
-        error: "Guide not found",
+        status: PROJECT_STATUS.DRAFT,
+        error: "Project not found",
         media: {
           thumbnailId: "",
         },
@@ -243,11 +243,11 @@ export class PurchasesService implements OnModuleInit {
     };
   }
 
-  async checkIfGuidePurchased(guideId: string): Promise<{
+  async checkIfProjectPurchased(projectId: string): Promise<{
     purchased: boolean;
   }> {
     const purchase = await this.purchaseModel.findOne({
-      guideId: new Types.ObjectId(guideId),
+      projectId: new Types.ObjectId(projectId),
       internalStatus: InternalPurchaseStatus.PAID,
       refunded: false,
     });
@@ -276,15 +276,17 @@ export class PurchasesService implements OnModuleInit {
     const userPurchases: UserPurchasesResponse[] = [];
 
     for (const purchase of purchases) {
-      const guide = await this.getGuideForPurchase(purchase.guideId.toString());
+      const project = await this.getProjectForPurchase(
+        purchase.projectId.toString(),
+      );
       const creator = await this.fetchUserData(purchase.creatorId.toString());
 
-      if (!guide) continue;
+      if (!project) continue;
 
       userPurchases.push({
-        title: guide.title,
-        slug: guide.slug,
-        thumbnailId: guide.media.thumbnailId,
+        title: project.title,
+        slug: project.slug,
+        thumbnailId: project.media.thumbnailId,
         creatorName: creator?.profileInfo?.username || "",
       });
     }
@@ -313,8 +315,10 @@ export class PurchasesService implements OnModuleInit {
     let totalPrice = 0;
 
     for (const earning of earnings) {
-      const guide = await this.getGuideForPurchase(earning.guideId.toString());
-      if (!guide) continue;
+      const project = await this.getProjectForPurchase(
+        earning.projectId.toString(),
+      );
+      if (!project) continue;
 
       totalEarnings += earning.creatorEarningsAmount || 0;
       totalSales += 1;
@@ -325,9 +329,9 @@ export class PurchasesService implements OnModuleInit {
         creatorId: earning.creatorId.toString(),
         earnings: convertLamportsToSol(earning.creatorEarningsAmount || 0),
         price: convertLamportsToSol(earning.priceAtPurchase || 0),
-        guideTitle: guide.title,
-        guideSlug: guide.slug,
-        guideCurrency: guide.currency,
+        projectTitle: project.title,
+        projectSlug: project.slug,
+        projectCurrency: project.currency,
         internalStatus: earning.internalStatus || "",
         createdAt: earning.createdAt || null,
       });
@@ -357,17 +361,19 @@ export class PurchasesService implements OnModuleInit {
     let totalPayments = 0;
 
     for (const payment of payments) {
-      const guide = await this.getGuideForPurchase(payment.guideId.toString());
-      if (!guide) continue;
+      const project = await this.getProjectForPurchase(
+        payment.projectId.toString() || "",
+      );
+      if (!project) continue;
 
       totalPayments += payment.priceAtPurchase || 0;
 
       userPayments.push({
         _id: payment._id.toString(),
         price: convertLamportsToSol(payment.priceAtPurchase || 0),
-        guideTitle: guide.title,
-        guideSlug: guide.slug,
-        guideCurrency: guide.currency,
+        projectTitle: project.title,
+        projectSlug: project.slug,
+        projectCurrency: project.currency,
         internalStatus: payment.internalStatus || "",
         createdAt: payment.createdAt || null,
       });
@@ -381,13 +387,13 @@ export class PurchasesService implements OnModuleInit {
 
   async markVideoPlaybackInitiated(
     userId: string,
-    guideId: string,
+    projectId: string,
     videoPlaybackUrl: string,
   ) {
     const result = await this.purchaseModel.updateOne(
       {
         userId,
-        guideId,
+        projectId,
         videoPlaybackInitiatedAt: null,
         refunded: false,
       },
@@ -405,18 +411,18 @@ export class PurchasesService implements OnModuleInit {
     if (result.matchedCount === 0) {
       const exists = await this.purchaseModel.exists({
         userId,
-        guideId,
+        projectId,
         refunded: false,
       });
-      if (!exists) throw new ForbiddenException("Guide not purchased");
+      if (!exists) throw new ForbiddenException("Project not purchased");
     }
 
     return { success: true };
   }
 
-  async getGuidesEligibleForRefund(
+  async getProjectsEligibleForRefund(
     userId: string,
-  ): Promise<GuidesEligibleForRefundResponse[]> {
+  ): Promise<ProjectsEligibleForRefundResponse[]> {
     const purchases = await this.purchaseModel
       .find({
         userId: new Types.ObjectId(userId),
@@ -428,18 +434,20 @@ export class PurchasesService implements OnModuleInit {
 
     if (!purchases || purchases.length === 0) return [];
 
-    const userPurchases: GuidesEligibleForRefundResponse[] = [];
+    const userPurchases: ProjectsEligibleForRefundResponse[] = [];
 
     for (const purchase of purchases) {
       const { isRefundable } = this.getRefundEligibility(purchase);
       if (!isRefundable) continue;
 
-      const guide = await this.getGuideForPurchase(purchase.guideId.toString());
-      if (!guide) continue;
+      const project = await this.getProjectForPurchase(
+        purchase.projectId.toString(),
+      );
+      if (!project) continue;
 
       userPurchases.push({
-        _id: guide._id.toString(),
-        title: guide.title,
+        _id: project._id.toString(),
+        title: project.title,
         purchaseId: purchase._id.toString(),
       });
     }
@@ -453,7 +461,7 @@ export class PurchasesService implements OnModuleInit {
 
   async getPurchaseAccessInternal(
     userId: string,
-    guideId: string,
+    projectId: string,
   ): Promise<{
     hasAccess: boolean;
     isRefundable?: boolean;
@@ -462,15 +470,15 @@ export class PurchasesService implements OnModuleInit {
     hasAccessedPdf?: boolean;
     purchase?: PurchaseInterface;
   }> {
-    if (!userId || !guideId) return { hasAccess: false };
+    if (!userId || !projectId) return { hasAccess: false };
 
     const userIdObj = new Types.ObjectId(userId);
-    const guideIdObj = new Types.ObjectId(guideId);
+    const projectIdObj = new Types.ObjectId(projectId);
 
     const purchase: PurchaseInterface | null = await this.purchaseModel.findOne(
       {
         userId: userIdObj,
-        guideId: guideIdObj,
+        projectId: projectIdObj,
         internalStatus: InternalPurchaseStatus.PAID,
         refunded: false,
       },
@@ -485,9 +493,9 @@ export class PurchasesService implements OnModuleInit {
       hasAccessedPdf,
     } = this.getRefundEligibility(purchase);
 
-    const refund = await this.refundsService.getRefundByPurchaseAndGuideId(
+    const refund = await this.refundsService.getRefundByPurchaseAndProjectId(
       purchase._id.toString(),
-      guideId,
+      projectId,
     );
 
     if (purchase.refunded || (refund && refund.refunded))

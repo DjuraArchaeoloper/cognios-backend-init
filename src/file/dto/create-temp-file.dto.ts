@@ -22,5 +22,5 @@ export class CreateTempFileDto {
 
   @IsMongoId()
   @IsOptional()
-  guideId?: string;
+  projectId?: string;
 }

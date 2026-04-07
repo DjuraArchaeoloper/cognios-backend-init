@@ -22,5 +22,5 @@ export class CreateTempImageDto {
 
   @IsMongoId()
   @IsOptional()
-  guideId?: string;
+  projectId?: string;
 }

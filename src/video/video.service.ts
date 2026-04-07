@@ -59,7 +59,7 @@ export class VideoService {
       throw new BadRequestException("Upload length must be a positive number");
 
     const MAX_VIDEO_SIZE =
-      purpose === VIDEO_PURPOSE.GUIDE_MAIN_VIDEO
+      purpose === VIDEO_PURPOSE.PROJECT_MAIN_VIDEO
         ? 1024 * 1024 * 1024
         : 100 * 1024 * 1024; // 1GB for main video, 100MB for preview video
 
@@ -69,10 +69,10 @@ export class VideoService {
       );
 
     const requireSignedURLs =
-      purpose === VIDEO_PURPOSE.GUIDE_MAIN_VIDEO ? true : false;
+      purpose === VIDEO_PURPOSE.PROJECT_MAIN_VIDEO ? true : false;
 
     const maxDurationSeconds =
-      purpose === VIDEO_PURPOSE.GUIDE_MAIN_VIDEO ? 3600 : 30; // 1 hour for main video, 30 seconds for preview video
+      purpose === VIDEO_PURPOSE.PROJECT_MAIN_VIDEO ? 3600 : 30; // 1 hour for main video, 30 seconds for preview video
 
     try {
       const endpoint = `https://api.cloudflare.com/client/v4/accounts/${accountId}/stream?direct_user=true`;

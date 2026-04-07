@@ -4,8 +4,8 @@ export enum VIDEO_PROVIDER {
 }
 
 export enum VIDEO_PURPOSE {
-  GUIDE_MAIN_VIDEO = "guide-main-video",
-  GUIDE_PREVIEW_VIDEO = "guide-preview-video",
+  PROJECT_MAIN_VIDEO = "project-main-video",
+  PROJECT_PREVIEW_VIDEO = "project-preview-video",
 }
 
 export enum VIDEO_STATUS {

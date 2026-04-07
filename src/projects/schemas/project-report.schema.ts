@@ -1,18 +1,18 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, Schema as MongooseSchema } from "mongoose";
-import { GuideReportReason, GuideReportStatus } from "../types/guides";
+import { ProjectReportReason, ProjectReportStatus } from "../types/projects";
 
-export type GuideReportDocument = GuideReport & Document;
+export type ProjectReportDocument = ProjectReport & Document;
 
 @Schema({ timestamps: true })
-export class GuideReport {
+export class ProjectReport {
   @Prop({
     type: MongooseSchema.Types.ObjectId,
-    ref: "Guide",
+    ref: "Project",
     required: true,
     index: true,
   })
-  guideId: MongooseSchema.Types.ObjectId;
+  projectId: MongooseSchema.Types.ObjectId;
 
   @Prop({
     type: MongooseSchema.Types.ObjectId,
@@ -24,10 +24,10 @@ export class GuideReport {
 
   @Prop({
     type: String,
-    enum: Object.values(GuideReportReason),
+    enum: Object.values(ProjectReportReason),
     required: true,
   })
-  reason: GuideReportReason;
+  reason: ProjectReportReason;
 
   @Prop({ required: false })
   message?: string;
@@ -37,13 +37,13 @@ export class GuideReport {
 
   @Prop({
     index: true,
-    enum: Object.values(GuideReportStatus),
+    enum: Object.values(ProjectReportStatus),
     required: true,
-    default: GuideReportStatus.PENDING,
+    default: ProjectReportStatus.PENDING,
   })
-  status: GuideReportStatus;
+  status: ProjectReportStatus;
 }
 
-export const GuideReportSchema = SchemaFactory.createForClass(GuideReport);
+export const ProjectReportSchema = SchemaFactory.createForClass(ProjectReport);
 
-GuideReportSchema.index({ guideId: 1, status: 1 });
+ProjectReportSchema.index({ projectId: 1, status: 1 });

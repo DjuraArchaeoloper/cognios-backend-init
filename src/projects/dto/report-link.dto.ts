@@ -1,5 +1,5 @@
 import { IsString, IsNotEmpty, IsEnum, IsUrl } from "class-validator";
-import { GuideLinkReportReason, GuideLinkType } from "../types/guides";
+import { ProjectLinkReportReason, ProjectLinkType } from "../types/projects";
 
 export class ReportLinkDto {
   @IsString()
@@ -11,11 +11,11 @@ export class ReportLinkDto {
   @IsUrl({}, { message: "Link must be a valid URL" })
   link: string;
 
-  @IsEnum(GuideLinkType)
+  @IsEnum(ProjectLinkType)
   @IsNotEmpty()
-  linkType: GuideLinkType;
+  linkType: ProjectLinkType;
 
-  @IsEnum(GuideLinkReportReason)
+  @IsEnum(ProjectLinkReportReason)
   @IsNotEmpty()
-  reason: GuideLinkReportReason;
+  reason: ProjectLinkReportReason;
 }
