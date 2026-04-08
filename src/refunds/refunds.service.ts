@@ -131,7 +131,6 @@ export class RefundsService {
 
       return { success: true, refund: newRefund };
     } catch (error: any) {
-      console.log("error", error);
       throw new BadRequestException(
         `Failed to process refund: ${error.message || "Unknown error"}`,
       );

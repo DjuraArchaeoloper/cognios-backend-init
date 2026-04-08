@@ -6,11 +6,18 @@ import {
   HttpStatus,
   UseGuards,
   Request,
+  Get,
+  Param,
+  Delete,
+  Patch,
+  Query,
 } from "@nestjs/common";
 import { InternalAuthGuard } from "src/common/guards/auth.guard";
-import { getUserId } from "src/common/helpers/auth";
+import { getUserId, getUserRole } from "src/common/helpers/auth";
 import { ProjectsService } from "./projects.service";
 import { CreateProjectDto } from "./dto/create-project.dto";
+import { UpdateProjectDto } from "./dto/update-project.dto";
+import { DIFFICULTY } from "./types/projects";
 
 @Controller("projects")
 export class ProjectsController {
@@ -35,182 +42,160 @@ export class ProjectsController {
     };
   }
 
-  // @Get("public/:slug")
-  // async getGuideMetadataBySlug(@Param("slug") slug: string) {
-  //   const guide = await this.projectsService.getGuideMetadataBySlug(slug);
-  //   return {
-  //     success: true,
-  //     data: guide,
-  //   };
-  // }
+  @Get("edit/:slug")
+  @UseGuards(InternalAuthGuard)
+  async getProjectForEditing(@Param("slug") slug: string, @Request() req) {
+    const userId = getUserId(req);
+    const userRole = getUserRole(req);
 
-  // @Get("sitemap")
-  // async getPublicGuidesForSitemap() {
-  //   const guides = await this.guidesService.getPublicGuidesForSitemap();
-  //   return {
-  //     success: true,
-  //     data: guides,
-  //   };
-  // }
+    const user = userId ? { id: userId, role: userRole } : null;
 
-  // @Get()
-  // @HttpCode(HttpStatus.OK)
-  // async getPublicGuides(
-  //   @Query("page") page = 1,
-  //   @Query("limit") limit = 12,
-  //   @Query("sortBy") sortBy = "createdAt",
-  //   @Query("sortOrder") sortOrder: "asc" | "desc" = "desc",
+    const project = await this.projectsService.getProjectForEditing(slug, user);
+    return {
+      success: true,
+      data: project,
+    };
+  }
 
-  //   @Query("category") categoryId?: string,
-  //   @Query("subcategory") subcategoryId?: string,
+  @Post(":id/publish")
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(InternalAuthGuard)
+  async publishProject(@Param("id") id: string, @Request() req) {
+    const userId = getUserId(req);
+    const result = await this.projectsService.publishProject(id, userId);
+    return {
+      success: result.success,
+      message: result.success ? "Project published successfully" : result.error,
+      data: { status: result.status },
+    };
+  }
 
-  //   @Query("search") search?: string,
-  //   @Query("difficulty") difficulty?: DIFFICULTY,
-  //   @Query("price") price?: string,
-  //   @Query("duration") duration?: string,
-  // ) {
-  //   return this.guidesService.findPublicExploreGuides({
-  //     page: Number(page),
-  //     limit: Number(limit),
-  //     sortBy,
-  //     sortOrder,
-  //     categoryId,
-  //     subcategoryId,
-  //     search,
-  //     difficulty,
-  //     price,
-  //     duration,
-  //   });
-  // }
+  @Post(":id/unpublish")
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(InternalAuthGuard)
+  async unpublishProject(@Param("id") id: string, @Request() req) {
+    const userId = getUserId(req);
+    const result = await this.projectsService.unpublishProject(id, userId);
+    return {
+      success: result.success,
+      message: result.success
+        ? "Project unpublished successfully"
+        : result.error,
+      data: { status: result.status },
+    };
+  }
 
-  // @Get(":slug")
-  // @HttpCode(HttpStatus.OK)
-  // async getGuideBySlug(@Param("slug") slug: string, @Request() req) {
-  //   const userId = getOptionalUserId(req);
-  //   const userRole = getOptionalUserRole(req) as string | undefined;
+  @Delete(":id")
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(InternalAuthGuard)
+  async deleteProject(@Param("id") id: string, @Request() req) {
+    const userId = getUserId(req);
+    const result = await this.projectsService.deleteProject(id, userId);
+    return {
+      success: result.success,
+      message: result.success ? "Project deleted successfully" : result.error,
+    };
+  }
 
-  //   const user = userId ? { id: userId, role: userRole || undefined } : null;
+  @Post("creator/:creatorId")
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(InternalAuthGuard)
+  async getProjectsByCreator(
+    @Param("creatorId") creatorId: string,
+    @Request() req,
+  ) {
+    const userId = getUserId(req);
+    const projects = await this.projectsService.getProjectsByCreator(
+      creatorId,
+      userId,
+    );
+    return {
+      success: true,
+      data: projects,
+    };
+  }
 
-  //   const guide = await this.guidesService.getGuideBySlug(slug, user);
-  //   return {
-  //     success: true,
-  //     data: guide,
-  //   };
-  // }
+  @Get(":slug")
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(InternalAuthGuard)
+  async getProjectBySlug(@Param("slug") slug: string, @Request() req) {
+    const userId = getUserId(req);
+    const userRole = getUserRole(req);
 
-  // @Post(":guideId/pdf/access")
-  // @HttpCode(HttpStatus.OK)
-  // @UseGuards(InternalAuthGuard)
-  // async accessPdf(@Param("guideId") guideId: string, @Request() req) {
-  //   const userId = getUserId(req);
-  //   const guidePdfAccess = await this.guidesService.accessGuidePdf(
-  //     userId,
-  //     guideId,
-  //   );
-  //   return {
-  //     success: true,
-  //     data: guidePdfAccess,
-  //   };
-  // }
+    const user = userId ? { id: userId, role: userRole || undefined } : null;
 
-  // @Get("edit/:slug")
-  // async getGuideForEditing(@Param("slug") slug: string, @Request() req) {
-  //   const userId = getUserId(req);
-  //   const userRole = getUserRole(req);
+    const project = await this.projectsService.getProjectBySlug(slug, user);
+    return {
+      success: true,
+      data: project,
+    };
+  }
 
-  //   const user = userId ? { id: userId, role: userRole } : null;
+  @Patch(":id")
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(InternalAuthGuard)
+  async updateProject(
+    @Param("id") id: string,
+    @Body() updateProjectDto: UpdateProjectDto,
+    @Request() req,
+  ) {
+    const userId = getUserId(req);
+    const project = await this.projectsService.updateProject(
+      id,
+      userId,
+      updateProjectDto,
+    );
+    return {
+      success: true,
+      message: "Project updated successfully",
+      data: project,
+    };
+  }
 
-  //   const guide = await this.guidesService.getGuideForEditing(slug, user);
-  //   return {
-  //     success: true,
-  //     data: guide,
-  //   };
-  // }
+  @Post(":projectId/pdf/access")
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(InternalAuthGuard)
+  async accessPdf(@Param("projectId") projectId: string, @Request() req) {
+    const userId = getUserId(req);
+    const projectPdfAccess = await this.projectsService.accessProjectPdf(
+      userId,
+      projectId,
+    );
+    return {
+      success: true,
+      data: projectPdfAccess,
+    };
+  }
 
-  // @Patch(":id")
-  // @HttpCode(HttpStatus.OK)
-  // @UseGuards(InternalAuthGuard)
-  // async updateGuide(
-  //   @Param("id") id: string,
-  //   @Body() updateGuideDto: UpdateGuideDto,
-  //   @Request() req,
-  // ) {
-  //   const userId = getUserId(req);
-  //   const guide = await this.guidesService.updateGuide(
-  //     id,
-  //     userId,
-  //     updateGuideDto,
-  //   );
-  //   return {
-  //     success: true,
-  //     message: "Guide updated successfully",
-  //     data: guide,
-  //   };
-  // }
+  @Get()
+  @HttpCode(HttpStatus.OK)
+  async getPublicProjects(
+    @Query("page") page = 1,
+    @Query("limit") limit = 12,
+    @Query("sortBy") sortBy = "createdAt",
+    @Query("sortOrder") sortOrder: "asc" | "desc" = "desc",
 
-  // @Post(":id/publish")
-  // @HttpCode(HttpStatus.OK)
-  // @UseGuards(InternalAuthGuard)
-  // async publishGuide(@Param("id") id: string, @Request() req) {
-  //   const userId = getUserId(req);
-  //   const result = await this.guidesService.publishGuide(id, userId);
-  //   return {
-  //     success: result.success,
-  //     message: result.success ? "Guide published successfully" : result.error,
-  //     data: { status: result.status },
-  //   };
-  // }
+    @Query("category") categoryId?: string,
+    @Query("subcategory") subcategoryId?: string,
 
-  // @Post(":id/unpublish")
-  // @HttpCode(HttpStatus.OK)
-  // @UseGuards(InternalAuthGuard)
-  // async unpublishGuide(@Param("id") id: string, @Request() req) {
-  //   const userId = getUserId(req);
-  //   const result = await this.guidesService.unpublishGuide(id, userId);
-  //   return {
-  //     success: result.success,
-  //     message: result.success ? "Guide unpublished successfully" : result.error,
-  //     data: { status: result.status },
-  //   };
-  // }
-
-  // @Post(":id/archive")
-  // @HttpCode(HttpStatus.OK)
-  // @UseGuards(InternalAuthGuard)
-  // async archiveGuide(@Param("id") id: string, @Request() req) {
-  //   const userId = getUserId(req);
-  //   const result = await this.guidesService.archiveGuide(id, userId);
-  //   return {
-  //     success: result.success,
-  //     message: result.success ? "Guide archived successfully" : result.error,
-  //     data: { status: result.status },
-  //   };
-  // }
-
-  // @Post(":id/unarchive")
-  // @HttpCode(HttpStatus.OK)
-  // @UseGuards(InternalAuthGuard)
-  // async unarchiveGuide(@Param("id") id: string, @Request() req) {
-  //   const userId = getUserId(req);
-  //   const result = await this.guidesService.unarchiveGuide(id, userId);
-  //   return {
-  //     success: result.success,
-  //     message: result.success ? "Guide unarchived successfully" : result.error,
-  //     data: { status: result.status },
-  //   };
-  // }
-
-  // @Delete(":id")
-  // @HttpCode(HttpStatus.OK)
-  // @UseGuards(InternalAuthGuard)
-  // async deleteGuide(@Param("id") id: string, @Request() req) {
-  //   const userId = getUserId(req);
-  //   const result = await this.guidesService.deleteGuide(id, userId);
-  //   return {
-  //     success: result.success,
-  //     message: result.success ? "Guide deleted successfully" : result.error,
-  //   };
-  // }
+    @Query("search") search?: string,
+    @Query("difficulty") difficulty?: DIFFICULTY,
+    @Query("price") price?: string,
+    @Query("duration") duration?: string,
+  ) {
+    return await this.projectsService.findPublicExploreProjects({
+      page: Number(page),
+      limit: Number(limit),
+      sortBy,
+      sortOrder,
+      categoryId,
+      subcategoryId,
+      search,
+      difficulty,
+      price,
+      duration,
+    });
+  }
 
   // @Post(":id/report")
   // @HttpCode(HttpStatus.OK)
@@ -245,63 +230,6 @@ export class ProjectsController {
   //   return {
   //     success: true,
   //     message: "Link report submitted successfully",
-  //   };
-  // }
-
-  // @Post("creator/:creatorId")
-  // @HttpCode(HttpStatus.OK)
-  // @UseGuards(InternalAuthGuard)
-  // async getGuidesByCreator(
-  //   @Param("creatorId") creatorId: string,
-  //   @Request() req,
-  // ) {
-  //   const userId = getUserId(req);
-  //   const guides = await this.guidesService.getGuidesByCreator(
-  //     creatorId,
-  //     userId,
-  //   );
-  //   return {
-  //     success: true,
-  //     data: guides,
-  //   };
-  // }
-
-  // @Post("save-guide/:guideId")
-  // @HttpCode(HttpStatus.OK)
-  // @UseGuards(InternalAuthGuard)
-  // async toggleSaveGuide(@Param("guideId") guideId: string, @Request() req) {
-  //   const userId = getUserId(req);
-  //   const savedGuide = await this.guidesService.toggleSaveGuide(
-  //     guideId,
-  //     userId,
-  //   );
-  //   return {
-  //     success: true,
-  //     data: savedGuide,
-  //   };
-  // }
-
-  // @Get("is-guide-saved/:guideId")
-  // @HttpCode(HttpStatus.OK)
-  // @UseGuards(InternalAuthGuard)
-  // async isGuideSaved(@Param("guideId") guideId: string, @Request() req) {
-  //   const userId = getUserId(req);
-  //   const isSaved = await this.guidesService.isGuideSaved(guideId, userId);
-  //   return {
-  //     success: true,
-  //     data: isSaved,
-  //   };
-  // }
-
-  // @Post("saved-guides")
-  // @HttpCode(HttpStatus.OK)
-  // @UseGuards(InternalAuthGuard)
-  // async getSavedGuides(@Request() req) {
-  //   const userId = getUserId(req);
-  //   const savedGuides = await this.guidesService.getSavedGuides(userId);
-  //   return {
-  //     success: true,
-  //     data: savedGuides,
   //   };
   // }
 

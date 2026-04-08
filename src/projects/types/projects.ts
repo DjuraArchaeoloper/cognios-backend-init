@@ -39,7 +39,7 @@ export interface Media {
   previewVideo?: Asset;
   mainVideo?: Asset;
   thumbnailId?: string;
-  guideFile?: Asset;
+  projectFile?: Asset;
   images?: string[];
 }
 
@@ -88,4 +88,29 @@ export enum ProjectReportStatus {
   PENDING = "pending",
   ACCEPTED = "accepted",
   REJECTED = "rejected",
+}
+
+export interface ProjectResponse {
+  project: Partial<ProjectInterface>;
+  access: ProjectAccess;
+  signedAssets?: SignedAssets;
+}
+
+export enum ACCESS_LEVEL {
+  NONE = "none",
+  PREVIEW = "preview",
+  FULL = "full",
+  OWNER = "owner",
+}
+export interface ProjectAccess {
+  level: ACCESS_LEVEL;
+  canWatch: boolean;
+  canDownloadPdf: boolean;
+  isRefundable?: boolean;
+  isOwner: boolean;
+  isPurchasable: boolean;
+}
+
+export interface SignedAssets {
+  videoToken?: string;
 }

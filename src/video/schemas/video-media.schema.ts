@@ -38,18 +38,8 @@ export class VideoMedia {
 
   @Prop({ type: Types.ObjectId, index: true })
   projectId?: Types.ObjectId;
-
-  @Prop({ type: Date, index: true })
-  expiresAt?: Date;
-
-  @Prop({ type: Date, required: false })
-  publishedAt?: Date;
-
-  @Prop({ type: Date, required: false })
-  orphanedAt?: Date;
 }
 
 export const VideoMediaSchema = SchemaFactory.createForClass(VideoMedia);
 
-VideoMediaSchema.index({ status: 1, expiresAt: 1 });
 VideoMediaSchema.index({ userId: 1, status: 1 });

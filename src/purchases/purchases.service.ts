@@ -225,10 +225,11 @@ export class PurchasesService implements OnModuleInit {
 
   async verifyPurchaseBySession(
     sessionId: string,
-    userId: string,
+    userId: string | null,
   ): Promise<{
     verified: boolean;
   }> {
+    if (!userId) throw new NotFoundException(`User ID is required`);
     const purchase = await this.purchaseModel.findOne({
       stripeCheckoutSessionId: sessionId,
       userId: new Types.ObjectId(userId),
@@ -386,10 +387,11 @@ export class PurchasesService implements OnModuleInit {
   }
 
   async markVideoPlaybackInitiated(
-    userId: string,
+    userId: string | null,
     projectId: string,
     videoPlaybackUrl: string,
   ) {
+    if (!userId) throw new NotFoundException(`User ID is required`);
     const result = await this.purchaseModel.updateOne(
       {
         userId,

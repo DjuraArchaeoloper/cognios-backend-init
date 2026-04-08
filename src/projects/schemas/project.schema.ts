@@ -4,7 +4,7 @@ import { DIFFICULTY, PROJECT_STATUS, PROJECT_TYPE } from "../types/projects";
 
 export type ProjectDocument = Project & Document;
 
-@Schema({ timestamps: true })
+@Schema()
 export class Literature {
   @Prop({ type: String, required: true })
   name: string;
@@ -16,19 +16,30 @@ export class Literature {
   isLinkDisabled: boolean;
 }
 
-@Schema({ timestamps: true })
-export class Media {
-  @Prop({ type: String, required: false })
-  previewVideo?: string;
+@Schema({ id: false })
+export class Asset {
+  @Prop({ type: String, required: true })
+  fileKey: string;
 
-  @Prop({ type: String, required: false })
-  mainVideo?: string;
+  @Prop({ type: String, required: true })
+  displayName: string;
+}
+
+export const AssetSubSchema = SchemaFactory.createForClass(Asset);
+
+@Schema({ id: false })
+export class Media {
+  @Prop({ type: AssetSubSchema, required: true })
+  previewVideo?: Asset;
+
+  @Prop({ type: AssetSubSchema, required: true })
+  mainVideo?: Asset;
 
   @Prop({ type: String, required: false })
   thumbnailId?: string;
 
-  @Prop({ type: String, required: false })
-  guideFile?: string;
+  @Prop({ type: AssetSubSchema, required: false })
+  projectFile?: Asset;
 
   @Prop({ type: [String], required: false })
   images?: string[];
@@ -71,7 +82,7 @@ export class Project {
   @Prop({
     type: Types.ObjectId,
     ref: "Subcategory",
-    required: true,
+    required: false,
     index: true,
   })
   subcategory: Types.ObjectId;

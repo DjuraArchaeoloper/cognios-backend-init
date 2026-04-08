@@ -13,6 +13,7 @@ import { MediaModule } from "./media/media.module";
 import { CategoryModule } from "./category/category.module";
 import { SubcategoryModule } from "./subcategory/subcategory.module";
 import { ProjectsModule } from "./projects/projects.module";
+import { UsersModule } from "./users/users.module";
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { ProjectsModule } from "./projects/projects.module";
     MediaModule,
     CategoryModule,
     SubcategoryModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

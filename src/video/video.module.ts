@@ -2,7 +2,6 @@ import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
 import { VideoController } from "./video.controller";
 import { VideoService } from "./video.service";
-import { InternalVideoService } from "./internal-video.service";
 import { VideoMedia, VideoMediaSchema } from "./schemas/video-media.schema";
 
 @Module({
@@ -12,7 +11,7 @@ import { VideoMedia, VideoMediaSchema } from "./schemas/video-media.schema";
     ]),
   ],
   controllers: [VideoController],
-  providers: [VideoService, InternalVideoService],
-  exports: [VideoService, InternalVideoService],
+  providers: [VideoService],
+  exports: [VideoService],
 })
 export class VideoModule {}

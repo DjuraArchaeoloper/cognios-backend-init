@@ -466,7 +466,7 @@ export class AuthService {
       subject: "Sign in to Cognios (creator)",
       html: `<p>Click to sign in:</p><p><a href="${verifyUrl}">Sign in to Cognios</a></p><p>This link expires in 15 minutes.</p>`,
     });
-    console.log("ERROR", error);
+
     if (error) return { ok: false };
     return { ok: true };
   }

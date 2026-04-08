@@ -5,9 +5,7 @@ export interface PurchaseInterface {
   creatorId: string;
   price: number;
   currency: string;
-  stripePaymentIntentId: string;
   creatorEarningsAmount: number;
-  stripePaymentIntentStatus: any;
   refundedAt?: Date;
   refundableUntil: Date;
   refunded?: boolean;

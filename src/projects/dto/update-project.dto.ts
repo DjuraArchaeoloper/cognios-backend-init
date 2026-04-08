@@ -12,15 +12,16 @@ import {
 } from "class-validator";
 import { Type } from "class-transformer";
 import { Types } from "mongoose";
+import type { Asset } from "../types/projects";
 
 class UpdateMediaDto {
   @IsString()
   @IsOptional()
-  previewVideo?: string;
+  previewVideo?: Asset;
 
   @IsString()
   @IsOptional()
-  mainVideo?: string;
+  mainVideo?: Asset;
 
   @IsString()
   @IsOptional()
@@ -28,7 +29,7 @@ class UpdateMediaDto {
 
   @IsString()
   @IsOptional()
-  projectFile?: string;
+  projectFile?: Asset;
 
   @IsArray()
   @IsOptional()

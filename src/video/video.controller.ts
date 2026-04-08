@@ -8,25 +8,18 @@ import {
   Param,
   Post,
   Query,
-  Request,
   Res,
   UseGuards,
 } from "@nestjs/common";
 import type { Response } from "express";
 import { VideoService } from "./video.service";
-import { InternalVideoService } from "./internal-video.service";
-import { CreateTempVideoDto } from "./dto/create-temp-media.dto";
-import { getUserId } from "src/common/helpers/auth";
 import { InternalAuthGuard } from "src/common/guards/auth.guard";
 import { VIDEO_PURPOSE } from "./types/types";
 import { ServiceToServiceGuard } from "src/common/guards/service.guard";
 
 @Controller("video")
 export class VideoController {
-  constructor(
-    private readonly videoService: VideoService,
-    private readonly internalVideoMediaService: InternalVideoService,
-  ) {}
+  constructor(private readonly videoService: VideoService) {}
 
   @Post("tus-upload-url")
   @HttpCode(HttpStatus.CREATED)
@@ -126,62 +119,9 @@ export class VideoController {
     };
   }
 
-  @Post("create-temp")
-  @HttpCode(HttpStatus.CREATED)
-  @UseGuards(InternalAuthGuard)
-  async createTempVideo(@Body() dto: CreateTempVideoDto) {
-    const media = await this.internalVideoMediaService.createTempVideo(dto);
-
-    return {
-      success: true,
-      data: {
-        mediaId: media._id,
-        status: media.status,
-      },
-      message: "Temp media record created",
-    };
-  }
-
-  @Post("make-media-orphan")
-  @HttpCode(HttpStatus.OK)
-  @UseGuards(InternalAuthGuard)
-  async makeMediaOrphan(
-    @Body() body: { mediaId: { id: string; isMediaId: boolean } },
-    @Request() req,
-  ) {
-    const userId = getUserId(req);
-    await this.internalVideoMediaService.makeMediaOrphan(body.mediaId, userId);
-
-    return {
-      success: true,
-      message: "Media deleted successfully",
-    };
-  }
-
   ///
   /// ----------------------------- INTERNAL SERVICE-TO-SERVICE ENDPOINTS -----------------------------
   ///
-
-  @Post("make-media-published/internal")
-  @HttpCode(HttpStatus.OK)
-  @UseGuards(ServiceToServiceGuard)
-  async makeMediaPublished(
-    @Body()
-    body: {
-      mediaId: string;
-      userId: string;
-    },
-  ) {
-    await this.internalVideoMediaService.makeMediaPublished(
-      body.mediaId,
-      body.userId,
-    );
-
-    return {
-      success: true,
-      message: "Media published successfully",
-    };
-  }
 
   @UseGuards(ServiceToServiceGuard)
   @Get(":videoUID/internal")

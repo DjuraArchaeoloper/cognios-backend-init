@@ -2,7 +2,6 @@ import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
 import { FileController } from "./file.controller";
 import { FileService } from "./file.service";
-import { InternalFileService } from "./internal-file.service";
 import { FileMedia, FileMediaSchema } from "./schemas/file-media.schema";
 
 @Module({
@@ -12,7 +11,7 @@ import { FileMedia, FileMediaSchema } from "./schemas/file-media.schema";
     ]),
   ],
   controllers: [FileController],
-  providers: [FileService, InternalFileService],
-  exports: [FileService, InternalFileService],
+  providers: [FileService],
+  exports: [FileService],
 })
 export class FileModule {}

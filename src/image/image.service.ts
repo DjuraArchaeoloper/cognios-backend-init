@@ -119,21 +119,27 @@ export class ImageService {
       }
 
       let processedBuffer: Buffer;
-      const sharpInstance = sharp(buffer).resize(targetWidth, targetHeight, {
-        fit: "inside",
-        withoutEnlargement: true,
-      });
+      const sharpInstance = sharp(buffer).resize(
+        Number(targetWidth),
+        Number(targetHeight),
+        {
+          fit: "inside",
+          withoutEnlargement: true,
+        },
+      );
 
       if (outputFormat === "jpeg") {
         processedBuffer = await sharpInstance
-          .jpeg({ quality, mozjpeg: true })
+          .jpeg({ quality: Number(quality), mozjpeg: true })
           .toBuffer();
       } else if (outputFormat === "png") {
         processedBuffer = await sharpInstance
-          .png({ quality, compressionLevel: 9 })
+          .png({ quality: Number(quality), compressionLevel: 9 })
           .toBuffer();
       } else {
-        processedBuffer = await sharpInstance.webp({ quality }).toBuffer();
+        processedBuffer = await sharpInstance
+          .webp({ quality: Number(quality) })
+          .toBuffer();
       }
 
       const fileId = randomUUID();

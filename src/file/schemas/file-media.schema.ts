@@ -39,18 +39,8 @@ export class FileMedia {
 
   @Prop({ type: Types.ObjectId, index: true })
   projectId?: Types.ObjectId;
-
-  @Prop({ type: Date, index: true })
-  expiresAt?: Date;
-
-  @Prop({ type: Date, required: false })
-  publishedAt?: Date;
-
-  @Prop({ type: Date, required: false })
-  orphanedAt?: Date;
 }
 
 export const FileMediaSchema = SchemaFactory.createForClass(FileMedia);
 
-FileMediaSchema.index({ status: 1, expiresAt: 1 });
 FileMediaSchema.index({ userId: 1, status: 1 });
