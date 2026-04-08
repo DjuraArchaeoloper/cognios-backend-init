@@ -18,6 +18,7 @@ import { ProjectsService } from "./projects.service";
 import { CreateProjectDto } from "./dto/create-project.dto";
 import { UpdateProjectDto } from "./dto/update-project.dto";
 import { DIFFICULTY } from "./types/projects";
+import { OptionalAuthGuard } from "src/common/guards/optional-auth.guard";
 
 @Controller("projects")
 export class ProjectsController {
@@ -117,7 +118,7 @@ export class ProjectsController {
 
   @Get(":slug")
   @HttpCode(HttpStatus.OK)
-  @UseGuards(InternalAuthGuard)
+  @UseGuards(OptionalAuthGuard)
   async getProjectBySlug(@Param("slug") slug: string, @Request() req) {
     const userId = getUserId(req);
     const userRole = getUserRole(req);

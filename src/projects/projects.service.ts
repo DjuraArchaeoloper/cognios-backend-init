@@ -180,7 +180,7 @@ export class ProjectsService {
   ): Promise<{
     hasAccess: boolean;
     isRefundable: boolean;
-    purchase?: PurchaseInterface;
+    purchase?: any;
   }> {
     const result = await this.purchasesService.getPurchaseAccessInternal(
       userId,
@@ -744,7 +744,7 @@ export class ProjectsService {
     slug: string,
     user: { id: string | null; role?: string | null } | null,
   ): Promise<ProjectResponse> {
-    if (!user) throw new NotFoundException(`User is required`);
+    console.log("ENTER");
     const project: any = await this.projectModel
       .findOne({ slug })
       .lean()
@@ -772,7 +772,7 @@ export class ProjectsService {
     let hasAccess = false;
     let isRefundable = false;
 
-    if (user.id && !isOwner) {
+    if (user?.id && !isOwner) {
       const purchaseAccess = await this.fetchPurchaseAccess(
         user.id,
         project._id,

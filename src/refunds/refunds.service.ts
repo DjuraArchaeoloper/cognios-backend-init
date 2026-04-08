@@ -1,10 +1,4 @@
-import {
-  BadRequestException,
-  forwardRef,
-  Inject,
-  Injectable,
-  NotFoundException,
-} from "@nestjs/common";
+import { forwardRef, Inject, Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, Types } from "mongoose";
 import { ConfigService } from "@nestjs/config";
@@ -67,75 +61,75 @@ export class RefundsService {
     } else throw new Error(`Failed to update support request ${requestId}`);
   }
 
-  async approveRefund(
-    userId: string,
-    projectId: string,
-    refundId: string,
-    adminMessage: string,
-  ): Promise<{
-    success: boolean;
-    refund: RefundDocument;
-  }> {
-    const purchase = await this.purchasesService.getPurchaseAccessInternal(
-      userId,
-      projectId,
-    );
-    if (!purchase || !purchase.purchase)
-      throw new NotFoundException("Purchase not found");
+  // async approveRefund(
+  //   userId: string,
+  //   projectId: string,
+  //   refundId: string,
+  //   adminMessage: string,
+  // ): Promise<{
+  //   success: boolean;
+  //   refund: RefundDocument;
+  // }> {
+  //   const purchase = await this.purchasesService.getPurchaseAccessInternal(
+  //     userId,
+  //     projectId,
+  //   );
+  //   if (!purchase || !purchase.purchase)
+  //     throw new NotFoundException("Purchase not found");
 
-    if (!purchase.isRefundable)
-      throw new BadRequestException(
-        `This purchase is not refundable because ${purchase.isWithinRefundWindow && "the 7-day refund window has expired"} ${purchase.hasAccessedVideo ? "the video has been accessed" : ""} ${purchase.hasAccessedPdf ? "the PDF has been accessed" : ""}`,
-      );
+  //   if (!purchase.isRefundable)
+  //     throw new BadRequestException(
+  //       `This purchase is not refundable because ${purchase.isWithinRefundWindow && "the 7-day refund window has expired"} ${purchase.hasAccessedVideo ? "the video has been accessed" : ""} ${purchase.hasAccessedPdf ? "the PDF has been accessed" : ""}`,
+  //     );
 
-    if (purchase.purchase?.refunded)
-      throw new BadRequestException("This purchase has already been refunded");
+  //   if (purchase.purchase?.refunded)
+  //     throw new BadRequestException("This purchase has already been refunded");
 
-    const existingRefund = await this.refundModel.findOne({
-      userId,
-      projectId,
-      supportRequestId: refundId,
-    });
+  //   const existingRefund = await this.refundModel.findOne({
+  //     userId,
+  //     projectId,
+  //     supportRequestId: refundId,
+  //   });
 
-    if (existingRefund)
-      throw new BadRequestException("This refund has already been requested");
+  //   if (existingRefund)
+  //     throw new BadRequestException("This refund has already been requested");
 
-    try {
-      const updatedPurchase =
-        await this.purchasesService.updatePurchaseRefunded(
-          purchase.purchase?._id,
-          "Customer requested refund",
-        );
+  //   try {
+  //     const updatedPurchase =
+  //       await this.purchasesService.updatePurchaseRefunded(
+  //         purchase.purchase?._id,
+  //         "Customer requested refund",
+  //       );
 
-      if (!updatedPurchase)
-        throw new BadRequestException("Failed to update purchase");
+  //     if (!updatedPurchase)
+  //       throw new BadRequestException("Failed to update purchase");
 
-      const newRefund = await this.refundModel.create({
-        userId: new Types.ObjectId(userId),
-        projectId: new Types.ObjectId(projectId),
-        supportRequestId: new Types.ObjectId(refundId),
-        purchaseId: new Types.ObjectId(purchase.purchase?._id),
-        adminMessage,
-        refunded: true,
-      });
+  //     const newRefund = await this.refundModel.create({
+  //       userId: new Types.ObjectId(userId),
+  //       projectId: new Types.ObjectId(projectId),
+  //       supportRequestId: new Types.ObjectId(refundId),
+  //       purchaseId: new Types.ObjectId(purchase.purchase?._id),
+  //       adminMessage,
+  //       refunded: true,
+  //     });
 
-      await this.updateSupportRequest(refundId, SupportRequestStatus.ACCEPTED);
+  //     await this.updateSupportRequest(refundId, SupportRequestStatus.ACCEPTED);
 
-      const user = await this.purchasesService.fetchUserData(userId);
+  //     const user = await this.purchasesService.fetchUserData(userId);
 
-      if (!user || !user.profileInfo?.email) {
-        return { success: true, refund: newRefund };
-      }
+  //     if (!user || !user.profileInfo?.email) {
+  //       return { success: true, refund: newRefund };
+  //     }
 
-      await this.emailService.sendRefundRequestEmail(user.profileInfo?.email);
+  //     await this.emailService.sendRefundRequestEmail(user.profileInfo?.email);
 
-      return { success: true, refund: newRefund };
-    } catch (error: any) {
-      throw new BadRequestException(
-        `Failed to process refund: ${error.message || "Unknown error"}`,
-      );
-    }
-  }
+  //     return { success: true, refund: newRefund };
+  //   } catch (error: any) {
+  //     throw new BadRequestException(
+  //       `Failed to process refund: ${error.message || "Unknown error"}`,
+  //     );
+  //   }
+  // }
 
   async getRefundByPurchaseAndProjectId(
     purchaseId: string,

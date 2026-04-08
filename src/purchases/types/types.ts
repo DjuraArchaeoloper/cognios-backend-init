@@ -1,8 +1,7 @@
 export enum InternalPurchaseStatus {
   PENDING = "pending",
-  PAID = "paid",
-  EXPIRED = "expired",
-  REFUNDED = "refunded",
+  PAID = "completed",
+  MINT_FAILED = "mint_failed",
 }
 export interface PurchaseInterface {
   _id: string;
@@ -10,20 +9,11 @@ export interface PurchaseInterface {
   projectId: string;
   creatorId: string;
   price: number;
-  currency: string;
-  creatorEarningsAmount: number;
+  creatorWalletAddress: string;
+  buyerWalletAddress: string;
+  nftMint: string;
   internalStatus: InternalPurchaseStatus;
-  refundedAt?: Date;
-  refundableUntil: Date;
-  refunded?: boolean;
-  refundReason?: string;
-  createdAt?: Date;
-  updatedAt?: Date;
-  pdfAvailable: boolean;
-  pdfAccessed?: boolean;
-  pdfAccessedAt?: Date;
-  videoPlaybackInitiatedAt?: Date;
-  videoPlaybackUrl?: string;
+  txSignature?: string;
 }
 
 export interface UserPurchasesResponse {

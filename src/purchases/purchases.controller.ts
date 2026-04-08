@@ -1,191 +1,163 @@
-import {
-  Controller,
-  Get,
-  Body,
-  Query,
-  HttpCode,
-  HttpStatus,
-  BadRequestException,
-  Post,
-  UseGuards,
-  Request,
-  Param,
-} from "@nestjs/common";
+import { Controller } from "@nestjs/common";
 import { PurchasesService } from "./purchases.service";
-import { InternalAuthGuard } from "src/common/guards/auth.guard";
-import { getUserId } from "src/common/helpers/auth";
-import { ServiceToServiceGuard } from "src/common/guards/service.guard";
 
 @Controller("billing/purchases")
 export class PurchasesController {
   constructor(private readonly purchasesService: PurchasesService) {}
 
-  @Get("verify-purchase")
-  @HttpCode(HttpStatus.OK)
-  async verifyPurchaseBySession(
-    @Query("session_id") sessionId: string,
-    @Request() req,
-  ) {
-    if (!sessionId) throw new BadRequestException("No session provided");
+  // @Get("verify-purchase")
+  // @HttpCode(HttpStatus.OK)
+  // async verifyPurchaseBySession(
+  //   @Query("session_id") sessionId: string,
+  //   @Request() req,
+  // ) {
+  //   if (!sessionId) throw new BadRequestException("No session provided");
 
-    const userId = getUserId(req);
+  //   const userId = getUserId(req);
 
-    const data = await this.purchasesService.verifyPurchaseBySession(
-      sessionId,
-      userId,
-    );
+  //   const data = await this.purchasesService.verifyPurchaseBySession(
+  //     sessionId,
+  //     userId,
+  //   );
 
-    return {
-      success: true,
-      data,
-    };
-  }
+  //   return {
+  //     success: true,
+  //     data,
+  //   };
+  // }
 
-  @Get("check-if-project-purchased/:projectId")
-  @HttpCode(HttpStatus.OK)
-  async checkIfProjectPurchased(@Param("projectId") projectId: string) {
-    if (!projectId) throw new BadRequestException("No project provided");
+  // @Post("get-user-purchases")
+  // @HttpCode(HttpStatus.OK)
+  // @UseGuards(InternalAuthGuard)
+  // async getUserPurchases(@Request() req) {
+  //   const userId = getUserId(req);
+  //   if (!userId) throw new BadRequestException("No user provided");
+  //   const purchases = await this.purchasesService.getUserPurchases(userId);
 
-    const data = await this.purchasesService.checkIfProjectPurchased(projectId);
+  //   return {
+  //     success: true,
+  //     data: purchases,
+  //   };
+  // }
 
-    return {
-      success: true,
-      data,
-    };
-  }
+  // @Post("creator-earnings")
+  // @HttpCode(HttpStatus.OK)
+  // @UseGuards(InternalAuthGuard)
+  // async getCreatorEarnings(@Request() req) {
+  //   const creatorId = getUserId(req);
 
-  @Post("get-user-purchases")
-  @HttpCode(HttpStatus.OK)
-  @UseGuards(InternalAuthGuard)
-  async getUserPurchases(@Request() req) {
-    const userId = getUserId(req);
-    if (!userId) throw new BadRequestException("No user provided");
-    const purchases = await this.purchasesService.getUserPurchases(userId);
+  //   if (!creatorId) throw new BadRequestException("No creator provided");
 
-    return {
-      success: true,
-      data: purchases,
-    };
-  }
+  //   const earnings = await this.purchasesService.getCreatorEarnings(creatorId);
 
-  @Post("creator-earnings")
-  @HttpCode(HttpStatus.OK)
-  @UseGuards(InternalAuthGuard)
-  async getCreatorEarnings(@Request() req) {
-    const creatorId = getUserId(req);
+  //   return {
+  //     success: true,
+  //     data: {
+  //       creatorEarnings: earnings?.creatorEarnings,
+  //       totalSales: earnings?.totalSales,
+  //       totalEarnings: earnings?.totalEarnings,
+  //       totalPrice: earnings?.totalPrice,
+  //     },
+  //   };
+  // }
 
-    if (!creatorId) throw new BadRequestException("No creator provided");
+  // @Post("user-payments")
+  // @HttpCode(HttpStatus.OK)
+  // @UseGuards(InternalAuthGuard)
+  // async getUserPayments(@Request() req) {
+  //   const userId = getUserId(req);
 
-    const earnings = await this.purchasesService.getCreatorEarnings(creatorId);
+  //   if (!userId) throw new BadRequestException("No user provided");
 
-    return {
-      success: true,
-      data: {
-        creatorEarnings: earnings?.creatorEarnings,
-        totalSales: earnings?.totalSales,
-        totalEarnings: earnings?.totalEarnings,
-        totalPrice: earnings?.totalPrice,
-      },
-    };
-  }
+  //   const payments = await this.purchasesService.getUserPayments(userId);
 
-  @Post("user-payments")
-  @HttpCode(HttpStatus.OK)
-  @UseGuards(InternalAuthGuard)
-  async getUserPayments(@Request() req) {
-    const userId = getUserId(req);
+  //   return {
+  //     success: true,
+  //     data: {
+  //       userPayments: payments?.userPayments,
+  //       totalPayments: payments?.totalPayments,
+  //     },
+  //   };
+  // }
 
-    if (!userId) throw new BadRequestException("No user provided");
+  // @Post("video-playback-initiated")
+  // @HttpCode(HttpStatus.OK)
+  // @UseGuards(InternalAuthGuard)
+  // async markVideoPlaybackInitiated(
+  //   @Request() req,
+  //   @Body() body: { projectId: string; videoPlaybackUrl: string },
+  // ) {
+  //   const userId = getUserId(req);
 
-    const payments = await this.purchasesService.getUserPayments(userId);
+  //   const result = await this.purchasesService.markVideoPlaybackInitiated(
+  //     userId,
+  //     body.projectId,
+  //     body.videoPlaybackUrl,
+  //   );
 
-    return {
-      success: true,
-      data: {
-        userPayments: payments?.userPayments,
-        totalPayments: payments?.totalPayments,
-      },
-    };
-  }
+  //   return {
+  //     success: true,
+  //     data: result,
+  //   };
+  // }
 
-  @Post("video-playback-initiated")
-  @HttpCode(HttpStatus.OK)
-  @UseGuards(InternalAuthGuard)
-  async markVideoPlaybackInitiated(
-    @Request() req,
-    @Body() body: { projectId: string; videoPlaybackUrl: string },
-  ) {
-    const userId = getUserId(req);
+  // @Post("eligible-for-refund")
+  // @HttpCode(HttpStatus.OK)
+  // @UseGuards(InternalAuthGuard)
+  // async getProjectsEligibleForRefund(@Request() req) {
+  //   const userId = getUserId(req);
+  //   if (!userId) throw new BadRequestException("No user provided");
+  //   const projects =
+  //     await this.purchasesService.getProjectsEligibleForRefund(userId);
+  //   return { success: true, data: projects };
+  // }
 
-    const result = await this.purchasesService.markVideoPlaybackInitiated(
-      userId,
-      body.projectId,
-      body.videoPlaybackUrl,
-    );
+  // @UseGuards(InternalAuthGuard)
+  // @Get("system-settings")
+  // async getSystemSettings() {
+  //   const result = await this.purchasesService.getSystemSettings();
+  //   return { success: true, data: result };
+  // }
 
-    return {
-      success: true,
-      data: result,
-    };
-  }
+  // ///
+  // /// ----------------------------- INTERNAL SERVICE-TO-SERVICE ENDPOINTS -----------------------------
+  // ///
 
-  @Post("eligible-for-refund")
-  @HttpCode(HttpStatus.OK)
-  @UseGuards(InternalAuthGuard)
-  async getProjectsEligibleForRefund(@Request() req) {
-    const userId = getUserId(req);
-    if (!userId) throw new BadRequestException("No user provided");
-    const projects =
-      await this.purchasesService.getProjectsEligibleForRefund(userId);
-    return { success: true, data: projects };
-  }
+  // @UseGuards(ServiceToServiceGuard)
+  // @Get("access/internal")
+  // @HttpCode(HttpStatus.OK)
+  // async getPurchaseAccessInternal(
+  //   @Query("userId") userId: string,
+  //   @Query("projectId") projectId: string,
+  // ) {
+  //   if (!userId || !projectId)
+  //     throw new BadRequestException("userId and projectId are required");
 
-  @UseGuards(InternalAuthGuard)
-  @Get("system-settings")
-  async getSystemSettings() {
-    const result = await this.purchasesService.getSystemSettings();
-    return { success: true, data: result };
-  }
+  //   const result = await this.purchasesService.getPurchaseAccessInternal(
+  //     userId,
+  //     projectId,
+  //   );
 
-  ///
-  /// ----------------------------- INTERNAL SERVICE-TO-SERVICE ENDPOINTS -----------------------------
-  ///
+  //   return {
+  //     success: true,
+  //     data: result,
+  //   };
+  // }
 
-  @UseGuards(ServiceToServiceGuard)
-  @Get("access/internal")
-  @HttpCode(HttpStatus.OK)
-  async getPurchaseAccessInternal(
-    @Query("userId") userId: string,
-    @Query("projectId") projectId: string,
-  ) {
-    if (!userId || !projectId)
-      throw new BadRequestException("userId and projectId are required");
+  // @UseGuards(ServiceToServiceGuard)
+  // @Post("update-access/internal")
+  // @HttpCode(HttpStatus.OK)
+  // async updatePurchaseAccessInternal(@Body() body: { purchaseId: string }) {
+  //   if (!body.purchaseId)
+  //     throw new BadRequestException("purchaseId is required");
 
-    const result = await this.purchasesService.getPurchaseAccessInternal(
-      userId,
-      projectId,
-    );
+  //   const result = await this.purchasesService.updatePurchaseAccessInternal(
+  //     body.purchaseId,
+  //   );
 
-    return {
-      success: true,
-      data: result,
-    };
-  }
-
-  @UseGuards(ServiceToServiceGuard)
-  @Post("update-access/internal")
-  @HttpCode(HttpStatus.OK)
-  async updatePurchaseAccessInternal(@Body() body: { purchaseId: string }) {
-    if (!body.purchaseId)
-      throw new BadRequestException("purchaseId is required");
-
-    const result = await this.purchasesService.updatePurchaseAccessInternal(
-      body.purchaseId,
-    );
-
-    return {
-      success: true,
-      data: result,
-    };
-  }
+  //   return {
+  //     success: true,
+  //     data: result,
+  //   };
+  // }
 }

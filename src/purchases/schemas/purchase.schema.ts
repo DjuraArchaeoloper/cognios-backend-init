@@ -29,6 +29,27 @@ export class Purchase {
 
   @Prop({
     type: String,
+    required: true,
+    index: true,
+  })
+  creatorWalletAddress: string;
+
+  @Prop({
+    type: String,
+    required: true,
+    index: true,
+  })
+  buyerWalletAddress: string;
+
+  @Prop({
+    type: String,
+    required: true,
+    index: true,
+  })
+  nftMint: string;
+
+  @Prop({
+    type: String,
     enum: InternalPurchaseStatus,
     default: InternalPurchaseStatus.PENDING,
     index: true,
@@ -36,74 +57,13 @@ export class Purchase {
   internalStatus: InternalPurchaseStatus;
 
   @Prop()
-  stripeChargeId?: string;
+  price?: number;
 
   @Prop()
-  priceAtPurchase?: number;
-
-  @Prop()
-  currency?: string;
-
-  @Prop()
-  creatorStripeAccountId?: string;
-
-  @Prop()
-  platformFeeAmount?: number;
-
-  @Prop()
-  creatorEarningsAmount?: number;
-
-  @Prop()
-  platformFeePercentage: number;
-
-  @Prop()
-  refundedAt?: Date;
-
-  @Prop()
-  refundableUntil: Date;
-
-  @Prop()
-  refunded: boolean;
-
-  @Prop()
-  refundReason?: string;
-
-  @Prop()
-  pdfAvailable: boolean;
-
-  @Prop()
-  pdfAccessed?: boolean;
-
-  @Prop()
-  pdfAccessedAt?: Date;
-
-  @Prop()
-  videoPlaybackInitiatedAt?: Date;
-
-  @Prop()
-  videoPlaybackUrl?: string;
-
-  @Prop()
-  expiresAt?: Date;
-
-  @Prop({ type: Date, default: Date.now })
-  createdAt?: Date;
-
-  @Prop({ type: Date, default: Date.now })
-  updatedAt?: Date;
+  txSignature?: string;
 }
 
 export const PurchaseSchema = SchemaFactory.createForClass(Purchase);
-
-PurchaseSchema.index(
-  { stripePaymentIntentId: 1 },
-  {
-    unique: true,
-    partialFilterExpression: {
-      stripePaymentIntentId: { $exists: true },
-    },
-  },
-);
 
 PurchaseSchema.index(
   { userId: 1, projectId: 1 },
