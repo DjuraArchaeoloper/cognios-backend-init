@@ -346,17 +346,6 @@ export class PurchasesController {
   //   };
   // }
 
-  // @Post("eligible-for-refund")
-  // @HttpCode(HttpStatus.OK)
-  // @UseGuards(InternalAuthGuard)
-  // async getProjectsEligibleForRefund(@Request() req) {
-  //   const userId = getUserId(req);
-  //   if (!userId) throw new BadRequestException("No user provided");
-  //   const projects =
-  //     await this.purchasesService.getProjectsEligibleForRefund(userId);
-  //   return { success: true, data: projects };
-  // }
-
   // ///
   // /// ----------------------------- INTERNAL SERVICE-TO-SERVICE ENDPOINTS -----------------------------
   // ///
@@ -373,22 +362,6 @@ export class PurchasesController {
   //   const result = await this.purchasesService.getPurchaseAccessInternal(
   //     userId,
   //     projectId,
-  //   );
-
-  //   return {
-  //     success: true,
-  //     data: result,
-  //   };
-  // }
-
-  // @Post("update-access/internal")
-  // @HttpCode(HttpStatus.OK)
-  // async updatePurchaseAccessInternal(@Body() body: { purchaseId: string }) {
-  //   if (!body.purchaseId)
-  //     throw new BadRequestException("purchaseId is required");
-
-  //   const result = await this.purchasesService.updatePurchaseAccessInternal(
-  //     body.purchaseId,
   //   );
 
   //   return {

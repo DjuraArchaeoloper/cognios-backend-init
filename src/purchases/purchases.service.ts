@@ -865,7 +865,6 @@ export class PurchasesService {
     walletAddress?: string,
   ): Promise<{
     hasAccess: boolean;
-    isRefundable?: boolean;
     purchase?: PurchaseInterface;
   }> {
     if (!userId || !projectId) return { hasAccess: false };
@@ -888,10 +887,8 @@ export class PurchasesService {
         expectedOwner,
       );
       if (hasOnChainOwnership) {
-        const { isRefundable } = this.getRefundEligibility(purchase);
         return {
           hasAccess: true,
-          isRefundable,
           purchase,
         };
       }
@@ -917,17 +914,7 @@ export class PurchasesService {
 
     return {
       hasAccess: true,
-      isRefundable: false,
       purchase: anyProjectMint as unknown as PurchaseInterface,
-    };
-  }
-
-  private getRefundEligibility(purchase: PurchaseInterface) {
-    const isRefundable =
-      purchase.internalStatus === InternalPurchaseStatus.PENDING;
-
-    return {
-      isRefundable,
     };
   }
 
@@ -1486,19 +1473,6 @@ export class PurchasesService {
   //   };
   // }
 
-  // async updatePurchaseRefunded(purchaseId: string, refundReason: string) {
-  //   const purchase = await this.purchaseModel.findByIdAndUpdate(purchaseId, {
-  //     $set: {
-  //       refunded: true,
-  //       refundedAt: new Date(),
-  //       refundReason,
-  //     },
-  //   });
-
-  //   if (!purchase) return null;
-  //   return purchase;
-  // }
-
   // async getUserPurchases(
   //   userId: string,
   // ): Promise<UserPurchasesResponse[] | null> {
@@ -1506,7 +1480,6 @@ export class PurchasesService {
   //     .find({
   //       userId: new Types.ObjectId(userId),
   //       internalStatus: InternalPurchaseStatus.PAID,
-  //       refunded: false,
   //     })
   //     .lean()
   //     .exec();
@@ -1541,7 +1514,6 @@ export class PurchasesService {
   //     .find({
   //       creatorId: new Types.ObjectId(creatorId),
   //       internalStatus: InternalPurchaseStatus.PAID,
-  //       refunded: false,
   //     })
   //     .sort({ createdAt: -1 })
   //     .lean()
@@ -1590,7 +1562,6 @@ export class PurchasesService {
   //     .find({
   //       userId: new Types.ObjectId(userId),
   //       internalStatus: InternalPurchaseStatus.PAID,
-  //       refunded: false,
   //     })
   //     .lean()
   //     .exec();
@@ -1636,7 +1607,6 @@ export class PurchasesService {
   //       userId,
   //       projectId,
   //       videoPlaybackInitiatedAt: null,
-  //       refunded: false,
   //     },
   //     {
   //       $set: {
@@ -1653,72 +1623,10 @@ export class PurchasesService {
   //     const exists = await this.purchaseModel.exists({
   //       userId,
   //       projectId,
-  //       refunded: false,
   //     });
   //     if (!exists) throw new ForbiddenException("Project not purchased");
   //   }
 
   //   return { success: true };
-  // }
-
-  // async getProjectsEligibleForRefund(
-  //   userId: string,
-  // ): Promise<ProjectsEligibleForRefundResponse[]> {
-  //   const purchases = await this.purchaseModel
-  //     .find({
-  //       userId: new Types.ObjectId(userId),
-  //       internalStatus: InternalPurchaseStatus.PAID,
-  //       refunded: false,
-  //     })
-  //     .lean()
-  //     .exec();
-
-  //   if (!purchases || purchases.length === 0) return [];
-
-  //   const userPurchases: ProjectsEligibleForRefundResponse[] = [];
-
-  //   for (const purchase of purchases) {
-  //     const { isRefundable } = this.getRefundEligibility(purchase);
-  //     if (!isRefundable) continue;
-
-  //     const project = await this.getProjectForPurchase(
-  //       purchase.projectId.toString(),
-  //     );
-  //     if (!project) continue;
-
-  //     userPurchases.push({
-  //       _id: project._id.toString(),
-  //       title: project.title,
-  //       purchaseId: purchase._id.toString(),
-  //     });
-  //   }
-
-  //   return userPurchases;
-  // }
-
-  // ///
-  // /// ----------------------------- INTERNAL SERVICE-TO-SERVICE METHODS -----------------------------
-  // ///
-
-  // async updatePurchaseAccessInternal(purchaseId: string) {
-  //   const purchase = await this.purchaseModel.findByIdAndUpdate(purchaseId, {
-  //     $set: {
-  //       pdfAccessed: true,
-  //       pdfAccessedAt: new Date(),
-  //       refundableUntil: null,
-  //     },
-  //   });
-
-  //   if (!purchase) return null;
-  //   return purchase;
-  // }
-
-  // async getSystemSettings(): Promise<SystemSettings> {
-  //   const systemSettings = await this.systemSettingsModel.findOne({
-  //     key: "main",
-  //   });
-  //   if (!systemSettings)
-  //     throw new NotFoundException("System settings not found");
-  //   return systemSettings;
   // }
 }

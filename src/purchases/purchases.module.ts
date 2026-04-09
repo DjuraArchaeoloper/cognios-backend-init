@@ -1,4 +1,4 @@
-import { Module, forwardRef } from "@nestjs/common";
+import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
 import { HttpModule } from "@nestjs/axios";
 import { PurchasesController } from "./purchases.controller";
@@ -8,7 +8,6 @@ import {
   MarketplaceListing,
   MarketplaceListingSchema,
 } from "./schemas/marketplace-listing.schema";
-import { RefundsModule } from "src/refunds/refunds.module";
 import { Project, ProjectSchema } from "src/projects/schemas/project.schema";
 
 @Module({
@@ -23,7 +22,6 @@ import { Project, ProjectSchema } from "src/projects/schemas/project.schema";
       { name: Project.name, schema: ProjectSchema },
     ]),
     HttpModule,
-    forwardRef(() => RefundsModule),
   ],
   controllers: [PurchasesController],
   providers: [PurchasesService],

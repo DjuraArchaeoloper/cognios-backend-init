@@ -5,7 +5,6 @@ import { AppService } from "./app.service";
 import { AuthModule } from "./auth/auth.module";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { PurchasesModule } from "./purchases/purchases.module";
-import { RefundsModule } from "./refunds/refunds.module";
 import { MediaModule } from "./media/media.module";
 import { CategoryModule } from "./category/category.module";
 import { ProjectsModule } from "./projects/projects.module";
@@ -24,7 +23,6 @@ import { ProjectsModule } from "./projects/projects.module";
     AuthModule,
     ProjectsModule,
     PurchasesModule,
-    RefundsModule,
     MediaModule,
     CategoryModule,
   ],

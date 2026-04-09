@@ -130,9 +130,6 @@ export class Project {
   @Prop({ type: Number, default: 0 })
   purchaseCount?: number;
 
-  @Prop({ type: Number, default: 0 })
-  refundRate?: number;
-
   @Prop({ type: String })
   flaggedReason?: string;
 

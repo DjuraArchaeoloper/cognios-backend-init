@@ -16,7 +16,6 @@ export interface ProjectInterface {
   difficulty: DIFFICULTY;
   estimatedDurationMinutes: number;
   purchaseCount: number;
-  refundRate: number;
   flaggedReason: string;
   createdAt: Date;
   updatedAt: Date;
@@ -94,7 +93,6 @@ export interface ProjectAccess {
   level: ACCESS_LEVEL;
   canWatch: boolean;
   canDownloadPdf: boolean;
-  isRefundable?: boolean;
   isOwner: boolean;
   isPurchasable: boolean;
 }

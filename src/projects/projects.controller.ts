@@ -224,23 +224,6 @@ export class ProjectsController {
   //   };
   // }
 
-  // @Post(":id/report-link")
-  // @HttpCode(HttpStatus.OK)
-  // @UseGuards(InternalAuthGuard)
-  // async reportLink(
-  //   @Param("id") id: string,
-  //   @Body() reportLinkDto: ReportLinkDto,
-  //   @Request() req,
-  // ) {
-  //   const userId = getUserId(req);
-
-  //   await this.projectsService.reportLink(id, reportLinkDto, userId);
-  //   return {
-  //     success: true,
-  //     message: "Link report submitted successfully",
-  //   };
-  // }
-
   // ///
   // /// ----------------------------- INTERNAL SERVICE-TO-SERVICE ENDPOINTS -----------------------------
   // ///
@@ -261,15 +244,6 @@ export class ProjectsController {
   //   return {
   //     success: true,
   //     message: "Purchase count incremented",
-  //   };
-  // }
-
-  // @Get("creator/:creatorId/public/internal")
-  // async getPublicProjectsByCreator(@Param("creatorId") creatorId: string) {
-  //   const projects = await this.projectsService.getPublicProjectsByCreator(creatorId);
-  //   return {
-  //     success: true,
-  //     data: projects,
   //   };
   // }
 }

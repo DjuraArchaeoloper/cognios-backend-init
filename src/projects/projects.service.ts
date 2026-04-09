@@ -181,7 +181,6 @@ export class ProjectsService {
     walletAddress?: string,
   ): Promise<{
     hasAccess: boolean;
-    isRefundable: boolean;
     purchase?: any;
   }> {
     const result = await this.purchasesService.getPurchaseAccessInternal(
@@ -190,11 +189,10 @@ export class ProjectsService {
       walletAddress,
     );
 
-    if (!result.hasAccess) return { hasAccess: false, isRefundable: false };
+    if (!result.hasAccess) return { hasAccess: false };
 
     return {
       hasAccess: result.hasAccess,
-      isRefundable: result.isRefundable || false,
       purchase: result.purchase,
     };
   }
@@ -759,7 +757,6 @@ export class ProjectsService {
     const isOwner = user !== null && project.creatorId?.toString() === user.id;
 
     let hasAccess = false;
-    let isRefundable = false;
 
     if (user?.id && !isOwner) {
       const purchaseAccess = await this.fetchPurchaseAccess(
@@ -769,7 +766,6 @@ export class ProjectsService {
       );
 
       hasAccess = purchaseAccess.hasAccess;
-      isRefundable = purchaseAccess.isRefundable;
     }
 
     // Access level
@@ -861,7 +857,6 @@ export class ProjectsService {
         canWatch: fullAccess,
         canDownloadPdf: fullAccess,
         isPurchasable,
-        isRefundable,
       },
       ...(signedAssets ? { signedAssets } : {}),
     };
@@ -1126,17 +1121,6 @@ export class ProjectsService {
   //   return this.projectModel.find(query).sort({ createdAt: -1 }).exec();
   // }
 
-  // getPublicProjectsByCreator(creatorId: string): Promise<ProjectDocument[]> {
-  //   return this.projectModel
-  //     .find({
-  //       creatorId: new Types.ObjectId(creatorId),
-  //       visibility: VISIBILITY_TYPE.PUBLIC,
-  //       status: PROJECT_STATUS.PUBLISHED,
-  //     })
-  //     .sort({ createdAt: -1 })
-  //     .exec();
-  // }
-
   // ///
   // /// ----------------------------- ADMIN FACING METHODS -----------------------------
   // ///
@@ -1304,26 +1288,6 @@ export class ProjectsService {
   //   return report;
   // }
 
-  // async disableLink(
-  //   projectId: string,
-  //   linkItemId: string,
-  //   linkType: ProjectLinkType,
-  // ) {
-  //   const field = linkType === ProjectLinkType.TOOL ? "tools" : "materials";
-
-  //   await this.projectModel.updateOne(
-  //     { _id: projectId },
-  //     {
-  //       $set: {
-  //         [`${field}.$[elem].isLinkDisabled`]: true,
-  //       },
-  //     },
-  //     {
-  //       arrayFilters: [{ "elem._id": new Types.ObjectId(linkItemId) }],
-  //     },
-  //   );
-  // }
-
   // ///
   // /// ----------------------------- INTERNAL SERVICE-TO-SERVICE METHODS -----------------------------
   // ///
@@ -1360,25 +1324,6 @@ export class ProjectsService {
   // async incrementPurchaseCount(id: string): Promise<void> {
   //   await this.projectModel.findByIdAndUpdate(id, {
   //     $inc: { purchaseCount: 1 },
-  //   });
-  // }
-
-  // ///
-  // /// ----------------------------- MODERATION METHODS -----------------------------
-  // ///
-
-  // private randomBetween(min: number, max: number): number {
-  //   return Math.random() * (max - min) + min;
-  // }
-
-  // private generateRandomTimestamps(
-  //   duration: number,
-  //   ranges: [number, number][],
-  // ): number[] {
-  //   return ranges.map(([min, max]) => {
-  //     const base = (duration * this.randomBetween(min, max)) / 100;
-  //     const jitter = this.randomBetween(-2, 2);
-  //     return Math.max(0, Math.floor(base + jitter));
   //   });
   // }
 }

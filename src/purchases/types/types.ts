@@ -92,9 +92,3 @@ export interface UserPayments {
   internalStatus: string;
   createdAt: Date | null;
 }
-
-export interface ProjectsEligibleForRefundResponse {
-  _id: string;
-  title: string;
-  purchaseId: string;
-}
