@@ -8,7 +8,6 @@ import { PurchasesModule } from "./purchases/purchases.module";
 import { RefundsModule } from "./refunds/refunds.module";
 import { MediaModule } from "./media/media.module";
 import { CategoryModule } from "./category/category.module";
-import { SubcategoryModule } from "./subcategory/subcategory.module";
 import { ProjectsModule } from "./projects/projects.module";
 
 @Module({
@@ -28,7 +27,6 @@ import { ProjectsModule } from "./projects/projects.module";
     RefundsModule,
     MediaModule,
     CategoryModule,
-    SubcategoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],

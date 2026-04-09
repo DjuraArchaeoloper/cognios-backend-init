@@ -248,32 +248,15 @@ export class ProjectsService {
     name: string;
     slug: string;
   } | null> {
-    if (!this.categoryServiceUrl)
-      throw new Error("CATEGORIES_SERVICE_URL not configured");
+    const subcategory =
+      await this.categoryService.getSubcategoryByIdInternal(subcategoryId);
+    if (!subcategory) return null;
 
-    const internalSecret = this.configService.get<string>(
-      "INTERNAL_SERVICE_SECRET",
-    );
-
-    const response = await firstValueFrom(
-      this.httpService.get(
-        `${this.categoryServiceUrl}/subcategories/${subcategoryId}/internal`,
-        {
-          headers: {
-            "x-internal-secret": internalSecret,
-          },
-        },
-      ),
-    );
-    if (response.data?.success && response.data?.data) {
-      const subcategory = response.data.data;
-      return {
-        _id: subcategory._id?.toString() || subcategoryId,
-        name: subcategory.name,
-        slug: subcategory.slug,
-      };
-    } else
-      throw new Error(`Failed to fetch subcategory by ID ${subcategoryId}`);
+    return {
+      _id: subcategory._id?.toString() || subcategoryId,
+      name: subcategory.name,
+      slug: subcategory.slug,
+    };
   }
 
   private async fetchUserData(userId: string): Promise<PublicUserDto | null> {
