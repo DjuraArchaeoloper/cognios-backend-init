@@ -4,22 +4,20 @@ import { HttpModule } from "@nestjs/axios";
 import { PurchasesController } from "./purchases.controller";
 import { PurchasesService } from "./purchases.service";
 import { Purchase, PurchaseSchema } from "./schemas/purchase.schema";
+import {
+  MarketplaceListing,
+  MarketplaceListingSchema,
+} from "./schemas/marketplace-listing.schema";
 import { RefundsModule } from "src/refunds/refunds.module";
 import { PurchasesAdminController } from "./purchases.admin.controller";
-import {
-  SystemSettings,
-  SystemSettingsSchema,
-} from "./schemas/system-settings";
+import { Project, ProjectSchema } from "src/projects/schemas/project.schema";
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: Purchase.name, schema: PurchaseSchema },
-      {
-        name: SystemSettings.name,
-        schema: SystemSettingsSchema,
-        collection: "system_settings",
-      },
+      { name: MarketplaceListing.name, schema: MarketplaceListingSchema },
+      { name: Project.name, schema: ProjectSchema },
     ]),
     HttpModule,
     forwardRef(() => RefundsModule),

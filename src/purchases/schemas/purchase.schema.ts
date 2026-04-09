@@ -43,10 +43,15 @@ export class Purchase {
 
   @Prop({
     type: String,
-    required: true,
     index: true,
   })
-  nftMint: string;
+  nftMint?: string;
+
+  @Prop({
+    type: String,
+    index: true,
+  })
+  metadataUri?: string;
 
   @Prop({
     type: String,
@@ -61,6 +66,25 @@ export class Purchase {
 
   @Prop()
   txSignature?: string;
+
+  @Prop({
+    type: String,
+    index: true,
+  })
+  mintTxSignature?: string;
+
+  @Prop()
+  mintedAt?: Date;
+
+  @Prop()
+  mintError?: string;
+
+  @Prop({
+    type: Date,
+    default: Date.now,
+    index: true,
+  })
+  purchasedAt?: Date;
 }
 
 export const PurchaseSchema = SchemaFactory.createForClass(Purchase);
@@ -69,6 +93,12 @@ PurchaseSchema.index(
   { userId: 1, projectId: 1 },
   {
     unique: true,
-    partialFilterExpression: { refunded: false },
+    partialFilterExpression: {
+      internalStatus: { $in: ["pending", "completed"] },
+    },
   },
 );
+
+PurchaseSchema.index({ txSignature: 1 }, { unique: true, sparse: true });
+PurchaseSchema.index({ mintTxSignature: 1 }, { unique: true, sparse: true });
+PurchaseSchema.index({ nftMint: 1 }, { unique: true, sparse: true });

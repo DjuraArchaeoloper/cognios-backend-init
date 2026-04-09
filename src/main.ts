@@ -2,9 +2,11 @@ import cookieParser from "cookie-parser";
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import helmet from "helmet";
+import { HttpExceptionLoggingFilter } from "./common/filters/http-exception-logging.filter";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.useGlobalFilters(new HttpExceptionLoggingFilter());
 
   const isProduction = process.env.NODE_ENV === "production";
   const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";

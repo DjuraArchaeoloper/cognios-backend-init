@@ -122,8 +122,15 @@ export class ProjectsController {
   async getProjectBySlug(@Param("slug") slug: string, @Request() req) {
     const userId = getUserId(req);
     const userRole = getUserRole(req);
+    const walletAddress = req.authUser?.walletAddress;
 
-    const user = userId ? { id: userId, role: userRole || undefined } : null;
+    const user = userId
+      ? {
+          id: userId,
+          role: userRole || undefined,
+          walletAddress: walletAddress || undefined,
+        }
+      : null;
 
     const project = await this.projectsService.getProjectBySlug(slug, user);
     return {

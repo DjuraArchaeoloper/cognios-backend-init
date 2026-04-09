@@ -177,6 +177,7 @@ export class ProjectsService {
   private async fetchPurchaseAccess(
     userId: string,
     projectId: string,
+    walletAddress?: string,
   ): Promise<{
     hasAccess: boolean;
     isRefundable: boolean;
@@ -185,6 +186,7 @@ export class ProjectsService {
     const result = await this.purchasesService.getPurchaseAccessInternal(
       userId,
       projectId,
+      walletAddress,
     );
 
     if (!result.hasAccess) return { hasAccess: false, isRefundable: false };
@@ -742,9 +744,12 @@ export class ProjectsService {
 
   async getProjectBySlug(
     slug: string,
-    user: { id: string | null; role?: string | null } | null,
+    user: {
+      id: string | null;
+      role?: string | null;
+      walletAddress?: string | null;
+    } | null,
   ): Promise<ProjectResponse> {
-    console.log("ENTER");
     const project: any = await this.projectModel
       .findOne({ slug })
       .lean()
@@ -776,6 +781,7 @@ export class ProjectsService {
       const purchaseAccess = await this.fetchPurchaseAccess(
         user.id,
         project._id,
+        user.walletAddress || undefined,
       );
 
       hasAccess = purchaseAccess.hasAccess;
