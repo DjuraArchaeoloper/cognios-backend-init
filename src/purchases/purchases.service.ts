@@ -1408,58 +1408,11 @@ export class PurchasesService {
     await new Promise((resolve) => setTimeout(resolve, ms));
   }
 
-  // async fetchUserData(userId: string): Promise<{
-  //   _id: string;
-  //   profileInfo?: {
-  //     username?: string;
-  //     email?: string;
-  //     accountStatus?: string;
-  //   };
-  //   financialInfo?: {
-  //     platformFeePercentage: number;
-  //     stripeVerified?: boolean;
-  //     stripeAccountId?: string;
-  //   };
-  // } | null> {
-  //   if (!this.authServiceUrl)
-  //     throw new Error("AUTH_SERVICE_URL not configured");
-
-  //   const internalSecret = this.configService.get<string>(
-  //     "INTERNAL_SERVICE_SECRET",
-  //   );
-
-  //   const response = await firstValueFrom(
-  //     this.httpService.get(`${this.authServiceUrl}/users/${userId}/internal`, {
-  //       headers: {
-  //         "x-internal-secret": internalSecret,
-  //       },
-  //     }),
-  //   );
-
-  //   if (response.data?.success && response.data?.data) {
-  //     const user = response.data.data;
-  //     return {
-  //       _id: user._id?.toString() || userId,
-  //       profileInfo: {
-  //         username: user.profileInfo?.username,
-  //         email: user.profileInfo?.email || user.email,
-  //         accountStatus: user.profileInfo?.accountStatus,
-  //       },
-  //       financialInfo: {
-  //         stripeVerified: user.financialInfo?.stripeVerified,
-  //         stripeAccountId: user.financialInfo?.stripeAccountId,
-  //         platformFeePercentage: user.financialInfo?.platformFeePercentage,
-  //       },
-  //     };
-  //   } else throw new Error(`Failed to fetch user data for userId ${userId}`);
-  // }
-
   // private async getProjectForPurchase(projectId: string): Promise<{
   //   _id: string;
   //   price: number;
   //   currency: string;
-  //   visibility: string;
-  //   mainCreator: string;
+  //   creatorId: string;
   //   title: string;
   //   slug: string;
   //   status: PROJECT_STATUS;
@@ -1490,8 +1443,8 @@ export class PurchasesService {
   //       _id: "",
   //       price: 0,
   //       currency: "",
-  //       visibility: "",
-  //       mainCreator: "",
+  //       status: "",
+  //       creatorId: "",
   //       title: "",
   //       slug: "",
   //       status: PROJECT_STATUS.DRAFT,
@@ -1544,27 +1497,6 @@ export class PurchasesService {
 
   //   if (!purchase) return null;
   //   return purchase;
-  // }
-
-  // async verifyPurchaseBySession(
-  //   sessionId: string,
-  //   userId: string | null,
-  // ): Promise<{
-  //   verified: boolean;
-  // }> {
-  //   if (!userId) throw new NotFoundException(`User ID is required`);
-  //   const purchase = await this.purchaseModel.findOne({
-  //     stripeCheckoutSessionId: sessionId,
-  //     userId: new Types.ObjectId(userId),
-  //     internalStatus: InternalPurchaseStatus.PAID,
-  //     refunded: false,
-  //   });
-
-  //   if (!purchase) return { verified: false };
-
-  //   return {
-  //     verified: true,
-  //   };
   // }
 
   // async getUserPurchases(

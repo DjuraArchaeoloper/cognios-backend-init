@@ -612,7 +612,7 @@ export class ProjectsService {
       return {
         success: false,
         error:
-          "You are not authorized to publish a guide because you are not verified as a creator or you do not have a stripe account.",
+          "You are not authorized to publish a project because you are not verified as a creator or you do not have a wallet.",
       };
 
     const existingProject = await this.projectModel
@@ -649,7 +649,7 @@ export class ProjectsService {
     if (isPurchased.purchased)
       return {
         success: false,
-        error: `Guide has been purchased and cannot be unpublished`,
+        error: `Project has been purchased and cannot be unpublished`,
       };
 
     const existingProject = await this.projectModel
@@ -909,7 +909,7 @@ export class ProjectsService {
       user.walletAddress === undefined
     )
       throw new ForbiddenException(
-        "You are not authorized to update a project because you are not verified as a creator or you do not have a stripe account.",
+        "You are not authorized to update a project because you are not verified as a creator or you do not have a wallet.",
       );
 
     const project = await this.projectModel.findById(id).exec();
@@ -1109,20 +1109,20 @@ export class ProjectsService {
     };
   }
 
-  // async reportGuide(
-  //   guideId: string,
-  //   dto: ReportGuideDto,
+  // async reportProject(
+  //   projectId: string,
+  //   dto: ReportProjectDto,
   //   userId: string,
   // ): Promise<boolean> {
-  //   const guide = await this.guideModel.findById(guideId).exec();
-  //   if (!guide)
-  //     throw new NotFoundException(`Guide with ID ${guideId} not found`);
+  //   const project = await this.projectModel.findById(projectId).exec();
+  //   if (!project)
+  //     throw new NotFoundException(`Project with ID ${projectId} not found`);
 
-  //   if (guide.mainCreator?.toString() === userId)
-  //     throw new ForbiddenException("You cannot report your own guide.");
+  //   if (project.creatorId?.toString() === userId)
+  //     throw new ForbiddenException("You cannot report your own project.");
 
-  //   const report = new this.guideReportModel({
-  //     guideId: new Types.ObjectId(guideId),
+  //   const report = new this.projectReportModel({
+  //     projectId: new Types.ObjectId(projectId),
   //     userId: new Types.ObjectId(userId),
   //     reason: dto.reason,
   //     message: dto.message,
@@ -1135,19 +1135,19 @@ export class ProjectsService {
   // }
 
   // async reportLink(
-  //   guideId: string,
+  //   projectId: string,
   //   dto: ReportLinkDto,
   //   userId: string,
   // ): Promise<boolean> {
-  //   const guide = await this.guideModel.findById(guideId).exec();
-  //   if (!guide)
-  //     throw new NotFoundException(`Guide with ID ${guideId} not found`);
+  //   const project = await this.projectModel.findById(projectId).exec();
+  //   if (!project)
+  //     throw new NotFoundException(`Project with ID ${projectId} not found`);
 
-  //   if (guide.mainCreator?.toString() === userId)
-  //     throw new ForbiddenException("You cannot report your own link.");
+  //   if (project.creatorId?.toString() === userId)
+  //     throw new ForbiddenException("You cannot report your own project.");
 
   //   const report = new this.linkReportModel({
-  //     guideId: new Types.ObjectId(guideId),
+  //     projectId: new Types.ObjectId(projectId),
   //     linkItemId: new Types.ObjectId(dto.linkItemId),
   //     linkType: dto.linkType,
   //     link: dto.link,
@@ -1161,20 +1161,20 @@ export class ProjectsService {
   //   return true;
   // }
 
-  // getAllGuides(categoryId?: string): Promise<GuideDocument[]> {
+  // getAllProjects(categoryId?: string): Promise<ProjectDocument[]> {
   //   const query: any = {};
   //   if (categoryId) {
   //     query.category = new Types.ObjectId(categoryId);
   //   }
-  //   return this.guideModel.find(query).sort({ createdAt: -1 }).exec();
+  //   return this.projectModel.find(query).sort({ createdAt: -1 }).exec();
   // }
 
-  // getPublicGuidesByCreator(creatorId: string): Promise<GuideDocument[]> {
-  //   return this.guideModel
+  // getPublicProjectsByCreator(creatorId: string): Promise<ProjectDocument[]> {
+  //   return this.projectModel
   //     .find({
-  //       mainCreator: new Types.ObjectId(creatorId),
+  //       creatorId: new Types.ObjectId(creatorId),
   //       visibility: VISIBILITY_TYPE.PUBLIC,
-  //       status: GUIDE_STATUS.PUBLISHED,
+  //       status: PROJECT_STATUS.PUBLISHED,
   //     })
   //     .sort({ createdAt: -1 })
   //     .exec();
@@ -1184,7 +1184,7 @@ export class ProjectsService {
   // /// ----------------------------- ADMIN FACING METHODS -----------------------------
   // ///
 
-  // async findAdminGuides({
+  // async findAdminProjects({
   //   page,
   //   limit,
   //   sortBy,
@@ -1197,14 +1197,12 @@ export class ProjectsService {
   //   limit: number;
   //   sortBy: string;
   //   sortOrder: "asc" | "desc";
-  //   status?: GUIDE_STATUS;
-  //   visibility?: VISIBILITY_TYPE;
+  //   status?: PROJECT_STATUS;
   //   search?: string;
   // }) {
   //   const query: any = {};
 
   //   if (status) query["status"] = status;
-  //   if (visibility) query["visibility"] = visibility;
 
   //   if (search) {
   //     query.$or = [
@@ -1219,19 +1217,19 @@ export class ProjectsService {
 
   //   const skip = (page - 1) * limit;
 
-  //   const [guides, total] = await Promise.all([
-  //     this.guideModel.aggregate([
+  //   const [projects, total] = await Promise.all([
+  //     this.projectModel.aggregate([
   //       { $match: query },
 
   //       {
   //         $lookup: {
-  //           from: "guide_reports",
-  //           let: { guideId: "$_id" },
+  //           from: "project_reports",
+  //           let: { projectId: "$_id" },
   //           pipeline: [
   //             {
   //               $match: {
-  //                 $expr: { $eq: ["$guideId", "$$guideId"] },
-  //                 status: GuideReportStatus.ACCEPTED,
+  //                 $expr: { $eq: ["$projectId", "$$projectId"] },
+  //                 status: ProjectReportStatus.ACCEPTED,
   //               },
   //             },
   //             { $count: "count" },
@@ -1256,13 +1254,13 @@ export class ProjectsService {
 
   //       {
   //         $lookup: {
-  //           from: "guide_link_reports",
-  //           let: { guideId: "$_id" },
+  //           from: "project_link_reports",
+  //           let: { projectId: "$_id" },
   //           pipeline: [
   //             {
   //               $match: {
-  //                 $expr: { $eq: ["$guideId", "$$guideId"] },
-  //                 status: GuideLinkReportStatus.ACCEPTED,
+  //                 $expr: { $eq: ["$projectId", "$$projectId"] },
+  //                 status: ProjectLinkReportStatus.ACCEPTED,
   //               },
   //             },
   //             {
@@ -1296,12 +1294,12 @@ export class ProjectsService {
   //       { $limit: limit },
   //     ]),
 
-  //     this.guideModel.countDocuments(query),
+  //     this.projectModel.countDocuments(query),
   //   ]);
 
   //   return {
   //     success: true,
-  //     data: guides,
+  //     data: projects,
   //     meta: {
   //       page,
   //       limit,
@@ -1311,7 +1309,7 @@ export class ProjectsService {
   //   };
   // }
 
-  // async findAdminGuideReports({
+  // async findAdminProjectReports({
   //   page,
   //   limit,
   //   sortBy,
@@ -1323,8 +1321,8 @@ export class ProjectsService {
   //   limit: number;
   //   sortBy: string;
   //   sortOrder: "asc" | "desc";
-  //   status?: GuideReportStatus;
-  //   reason?: GuideReportReason;
+  //   status?: ProjectReportStatus;
+  //   reason?: ProjectReportReason;
   // }) {
   //   const query: any = {};
 
@@ -1338,14 +1336,14 @@ export class ProjectsService {
   //   const skip = (page - 1) * limit;
 
   //   const [reports, total] = await Promise.all([
-  //     this.guideReportModel
+  //     this.projectReportModel
   //       .find(query)
   //       .sort(sort)
   //       .skip(skip)
-  //       .populate("guideId", "title description slug")
+  //       .populate("projectId", "title description slug")
   //       .limit(limit)
   //       .lean(),
-  //     this.guideReportModel.countDocuments(query),
+  //     this.projectReportModel.countDocuments(query),
   //   ]);
 
   //   return {
@@ -1360,7 +1358,7 @@ export class ProjectsService {
   //   };
   // }
 
-  // async findAdminGuideLinkReports({
+  // async findAdminProjectLinkReports({
   //   page,
   //   limit,
   //   sortBy,
@@ -1372,8 +1370,8 @@ export class ProjectsService {
   //   limit: number;
   //   sortBy: string;
   //   sortOrder: "asc" | "desc";
-  //   status?: GuideLinkReportStatus;
-  //   reason?: GuideLinkReportReason;
+  //   status?: ProjectLinkReportStatus;
+  //   reason?: ProjectLinkReportReason;
   // }) {
   //   const query: any = {};
 
@@ -1387,14 +1385,14 @@ export class ProjectsService {
   //   const skip = (page - 1) * limit;
 
   //   const [reports, total] = await Promise.all([
-  //     this.linkReportModel
+  //     this.projectLinkReportModel
   //       .find(query)
   //       .sort(sort)
   //       .skip(skip)
-  //       .populate("guideId", "title description slug")
+  //       .populate("projectId", "title description slug")
   //       .limit(limit)
   //       .lean(),
-  //     this.linkReportModel.countDocuments(query),
+  //     this.projectLinkReportModel.countDocuments(query),
   //   ]);
 
   //   return {
@@ -1409,21 +1407,21 @@ export class ProjectsService {
   //   };
   // }
 
-  // async updateGuideStatus(guideId: string, status: GUIDE_STATUS) {
-  //   const guide = await this.guideModel
-  //     .findByIdAndUpdate(guideId, { status }, { new: true })
+  // async updateProjectStatus(projectId: string, status: PROJECT_STATUS) {
+  //   const project = await this.projectModel
+  //     .findByIdAndUpdate(projectId, { status }, { new: true })
   //     .exec();
 
-  //   if (!guide) throw new NotFoundException(`Guide not found`);
+  //   if (!project) throw new NotFoundException(`Project not found`);
 
-  //   return guide;
+  //   return project;
   // }
 
-  // async takeGuideReportAction(
+  // async takeProjectReportAction(
   //   reportId: string,
-  //   status: GuideReportStatus,
-  // ): Promise<GuideReportDocument> {
-  //   const report = await this.guideReportModel.findByIdAndUpdate(
+  //   status: ProjectReportStatus,
+  // ): Promise<ProjectReportDocument> {
+  //   const report = await this.projectReportModel.findByIdAndUpdate(
   //     reportId,
   //     {
   //       status,
@@ -1431,19 +1429,19 @@ export class ProjectsService {
   //     { new: true },
   //   );
 
-  //   if (!report) throw new NotFoundException("Guide report not found");
+  //   if (!report) throw new NotFoundException("Project report not found");
   //   return report;
   // }
 
   // async disableLink(
-  //   guideId: string,
+  //   projectId: string,
   //   linkItemId: string,
-  //   linkType: GuideLinkType,
+  //   linkType: ProjectLinkType,
   // ) {
-  //   const field = linkType === GuideLinkType.TOOL ? "tools" : "materials";
+  //   const field = linkType === ProjectLinkType.TOOL ? "tools" : "materials";
 
-  //   await this.guideModel.updateOne(
-  //     { _id: guideId },
+  //   await this.projectModel.updateOne(
+  //     { _id: projectId },
   //     {
   //       $set: {
   //         [`${field}.$[elem].isLinkDisabled`]: true,
@@ -1455,31 +1453,31 @@ export class ProjectsService {
   //   );
   // }
 
-  // async takeGuideLinkReportAction(
+  // async takeProjectLinkReportAction(
   //   reportId: string,
-  //   status: GuideLinkReportStatus,
-  // ): Promise<LinkReportDocument> {
-  //   const report = await this.linkReportModel.findById(reportId);
+  //   status: ProjectLinkReportStatus,
+  // ): Promise<ProjectLinkReportDocument> {
+  //   const report = await this.projectLinkReportModel.findById(reportId);
 
-  //   if (!report) throw new NotFoundException("Guide link report not found");
+  //   if (!report) throw new NotFoundException("Project link report not found");
 
   //   if (report.status === status) return report;
 
   //   report.status = status;
   //   await report.save();
 
-  //   if (status === GuideLinkReportStatus.ACCEPTED) {
+  //   if (status === ProjectLinkReportStatus.ACCEPTED) {
   //     const FLAG_THRESHOLD = 5;
 
-  //     const acceptedCount = await this.linkReportModel.countDocuments({
-  //       guideId: report.guideId,
+  //     const acceptedCount = await this.projectLinkReportModel.countDocuments({
+  //       projectId: report.projectId,
   //       linkItemId: report.linkItemId,
-  //       status: GuideLinkReportStatus.ACCEPTED,
+  //       status: ProjectLinkReportStatus.ACCEPTED,
   //     });
 
   //     if (acceptedCount >= FLAG_THRESHOLD) {
   //       await this.disableLink(
-  //         report.guideId.toString(),
+  //         report.projectId.toString(),
   //         report.linkItemId.toString(),
   //         report.linkType,
   //       );
@@ -1493,17 +1491,17 @@ export class ProjectsService {
   // /// ----------------------------- INTERNAL SERVICE-TO-SERVICE METHODS -----------------------------
   // ///
 
-  // async getGuideForPurchase(guideId: string) {
-  //   const guide = await this.guideModel
+  // async getProjectForPurchase(projectId: string) {
+  //   const project = await this.projectModel
   //     .findOne(
   //       {
-  //         _id: guideId,
+  //         _id: projectId,
   //       },
   //       {
   //         _id: 1,
   //         price: 1,
-  //         visibility: 1,
-  //         mainCreator: 1,
+  //         status: 1,
+  //         creatorId: 1,
   //         currency: 1,
   //         title: 1,
   //         slug: 1,
@@ -1514,16 +1512,16 @@ export class ProjectsService {
   //         },
   //       },
   //     )
-  //     .lean<PurchaseGuideResponse>()
+  //     .lean<PurchaseProjectResponse>()
   //     .exec();
 
-  //   if (!guide)
-  //     throw new NotFoundException(`Guide with ID ${guideId} not found`);
-  //   return guide;
+  //   if (!project)
+  //     throw new NotFoundException(`Project with ID ${projectId} not found`);
+  //   return project;
   // }
 
   // async incrementPurchaseCount(id: string): Promise<void> {
-  //   await this.guideModel.findByIdAndUpdate(id, {
+  //   await this.projectModel.findByIdAndUpdate(id, {
   //     $inc: { purchaseCount: 1 },
   //   });
   // }

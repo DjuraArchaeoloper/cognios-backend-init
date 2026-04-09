@@ -71,17 +71,17 @@ export class ProjectsAdminController {
   // }
 
   // @Patch(":id/status")
-  // async updateGuideStatus(
-  //   @Param("id") guideId: string,
+  // async updateProjectStatus(
+  //   @Param("id") projectId: string,
   //   @Body() body: { status: PROJECT_STATUS },
   // ) {
-  //   const guide = await this.projectsService.updateProjectStatus(
-  //     guideId,
+  //   const project = await this.projectsService.updateProjectStatus(
+  //     projectId,
   //     body.status,
   //   );
   //   return {
   //     success: true,
-  //     data: guide,
+  //     data: project,
   //   };
   // }
 

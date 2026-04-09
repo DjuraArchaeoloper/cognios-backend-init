@@ -207,16 +207,16 @@ export class ProjectsController {
 
   // @Post(":id/report")
   // @HttpCode(HttpStatus.OK)
-  // async reportGuide(
+  // async reportProject(
   //   @Param("id") id: string,
-  //   @Body() reportGuideDto: ReportGuideDto,
+  //   @Body() reportProjectDto: ReportProjectDto,
   //   @Request() req,
   // ) {
   //   const userId = getUserId(req);
 
-  //   const success = await this.guidesService.reportGuide(
+  //   const success = await this.projectsService.reportProject(
   //     id,
-  //     reportGuideDto,
+  //     reportProjectDto,
   //     userId,
   //   );
   //   return {
@@ -234,7 +234,7 @@ export class ProjectsController {
   // ) {
   //   const userId = getUserId(req);
 
-  //   await this.guidesService.reportLink(id, reportLinkDto, userId);
+  //   await this.projectsService.reportLink(id, reportLinkDto, userId);
   //   return {
   //     success: true,
   //     message: "Link report submitted successfully",
@@ -246,12 +246,12 @@ export class ProjectsController {
   // ///
 
   // @UseGuards(ServiceToServiceGuard)
-  // @Get(":guideId/internal")
-  // async getGuideForPurchase(@Param("guideId") guideId: string) {
-  //   const guide = await this.guidesService.getGuideForPurchase(guideId);
+  // @Get(":projectId/internal")
+  // async getProjectForPurchase(@Param("projectId") projectId: string) {
+  //   const project = await this.projectsService.getProjectForPurchase(projectId);
   //   return {
   //     success: true,
-  //     data: guide,
+  //     data: project,
   //   };
   // }
 
@@ -259,7 +259,7 @@ export class ProjectsController {
   // @HttpCode(HttpStatus.OK)
   // @UseGuards(ServiceToServiceGuard)
   // async incrementPurchaseCount(@Param("id") id: string) {
-  //   await this.guidesService.incrementPurchaseCount(id);
+  //   await this.projectsService.incrementPurchaseCount(id);
   //   return {
   //     success: true,
   //     message: "Purchase count incremented",
@@ -268,11 +268,11 @@ export class ProjectsController {
 
   // @Get("creator/:creatorId/public/internal")
   // @UseGuards(ServiceToServiceGuard)
-  // async getPublicGuidesByCreator(@Param("creatorId") creatorId: string) {
-  //   const guides = await this.guidesService.getPublicGuidesByCreator(creatorId);
+  // async getPublicProjectsByCreator(@Param("creatorId") creatorId: string) {
+  //   const projects = await this.projectsService.getPublicProjectsByCreator(creatorId);
   //   return {
   //     success: true,
-  //     data: guides,
+  //     data: projects,
   //   };
   // }
 }

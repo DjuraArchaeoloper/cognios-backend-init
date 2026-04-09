@@ -31,7 +31,7 @@ export class Refund {
     required: true,
     index: true,
   })
-  stripeRefundId: string;
+  marketplaceListingId: string;
 
   @Prop({
     type: Types.ObjectId,
