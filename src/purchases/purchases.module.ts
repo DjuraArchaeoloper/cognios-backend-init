@@ -15,7 +15,11 @@ import { Project, ProjectSchema } from "src/projects/schemas/project.schema";
   imports: [
     MongooseModule.forFeature([
       { name: Purchase.name, schema: PurchaseSchema },
-      { name: MarketplaceListing.name, schema: MarketplaceListingSchema },
+      {
+        name: MarketplaceListing.name,
+        schema: MarketplaceListingSchema,
+        collection: "marketplace_listings",
+      },
       { name: Project.name, schema: ProjectSchema },
     ]),
     HttpModule,
