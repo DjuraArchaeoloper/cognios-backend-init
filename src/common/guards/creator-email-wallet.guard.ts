@@ -4,8 +4,8 @@ import {
   ForbiddenException,
   Injectable,
 } from "@nestjs/common";
-import { RoleName } from "src/auth/auth.types";
 import type { AuthenticatedUser } from "../types/auth-user";
+import { RoleName } from "src/auth/types/auth.types";
 
 @Injectable()
 export class CreatorEmailWalletGuard implements CanActivate {

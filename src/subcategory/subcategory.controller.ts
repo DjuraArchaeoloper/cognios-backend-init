@@ -1,13 +1,5 @@
-import {
-  Controller,
-  Get,
-  Param,
-  HttpCode,
-  HttpStatus,
-  UseGuards,
-} from "@nestjs/common";
+import { Controller, Get, Param, HttpCode, HttpStatus } from "@nestjs/common";
 import { SubcategoryService } from "./subcategory.service";
-import { ServiceToServiceGuard } from "src/common/guards/service.guard";
 
 @Controller("subcategories")
 export class SubcategoryController {
@@ -44,7 +36,6 @@ export class SubcategoryController {
   /// ----------------------------- INTERNAL SERVICE-TO-SERVICE ENDPOINTS -----------------------------
   ///
 
-  @UseGuards(ServiceToServiceGuard)
   @HttpCode(HttpStatus.OK)
   @Get(":id/internal")
   async getSubcategoryByIdInternal(@Param("id") id: string) {

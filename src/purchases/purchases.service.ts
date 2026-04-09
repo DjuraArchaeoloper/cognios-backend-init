@@ -120,7 +120,7 @@ export class PurchasesService {
         {
           type: "Royalties",
           basisPoints: this.creatorRoyaltyBps,
-          creators: [{ address: creatorUmiPk, percentage: 15 }],
+          creators: [{ address: creatorUmiPk, percentage: 100 }],
           ruleSet: ruleSet("None"),
         },
       ],
@@ -943,7 +943,7 @@ export class PurchasesService {
       return `${fallbackBase.replace(
         /\/$/,
         "",
-      )}/billing/purchases/metadata/${projectId}/${userId}.json`;
+      )}/purchases/metadata/${projectId}/${userId}.json`;
     }
     return `${base.replace(/\/$/, "")}/${projectId}/${userId}.json`;
   }

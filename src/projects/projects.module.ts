@@ -2,7 +2,6 @@ import { Module } from "@nestjs/common";
 import { HttpModule } from "@nestjs/axios";
 import { MongooseModule } from "@nestjs/mongoose";
 import { Project, ProjectSchema } from "./schemas/project.schema";
-import { LinkReport, LinkReportSchema } from "./schemas/link-report.schema";
 import {
   ProjectReport,
   ProjectReportSchema,
@@ -10,31 +9,29 @@ import {
 import { ProjectsService } from "./projects.service";
 import { ProjectsController } from "./projects.controller";
 import { ProjectsAdminController } from "./projects.admin.controller";
-import { UsersModule } from "src/users/users.module";
-import { FileMedia, FileMediaSchema } from "src/file/schemas/file-media.schema";
+import {
+  FileMedia,
+  FileMediaSchema,
+} from "src/media/schemas/file-media.schema";
 import {
   ImageMedia,
   ImageMediaSchema,
-} from "src/image/schemas/image-media.schema";
-import {
-  VideoMedia,
-  VideoMediaSchema,
-} from "src/video/schemas/video-media.schema";
+} from "src/media/schemas/image-media.schema";
 import { CategoryModule } from "src/category/category.module";
 import { PurchasesModule } from "src/purchases/purchases.module";
 import { MediaModule } from "src/media/media.module";
+import {
+  VideoMedia,
+  VideoMediaSchema,
+} from "src/media/schemas/video-media.schema";
+import { AuthModule } from "src/auth/auth.module";
 
 @Module({
   imports: [
     HttpModule,
-    UsersModule,
+    AuthModule,
     MongooseModule.forFeature([
       { name: Project.name, schema: ProjectSchema },
-      {
-        name: LinkReport.name,
-        schema: LinkReportSchema,
-        collection: "project_link_reports",
-      },
       {
         name: ProjectReport.name,
         schema: ProjectReportSchema,

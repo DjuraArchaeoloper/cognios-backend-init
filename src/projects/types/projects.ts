@@ -63,18 +63,6 @@ export enum ProjectLinkType {
   LITERATURE = "literature",
 }
 
-export enum ProjectLinkReportReason {
-  INAPPROPRIATE = "inappropriate",
-  SPAM = "spam",
-  OTHER = "other",
-}
-
-export enum ProjectLinkReportStatus {
-  PENDING = "pending",
-  ACCEPTED = "accepted",
-  REJECTED = "rejected",
-}
-
 export enum ProjectReportReason {
   DANGEROUS = "dangerous",
   COPYRIGHT = "copyright",

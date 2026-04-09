@@ -1,4 +1,4 @@
-import { RoleName } from "src/auth/auth.types";
+import { RoleName } from "src/auth/types/auth.types";
 
 export interface AuthenticatedUser {
   id: string;

@@ -15,8 +15,9 @@ import {
   SessionTokenPayload,
   SessionUserDto,
   WalletLinkTokenPayload,
-} from "./auth.types";
+} from "./types/auth.types";
 import { User, UserDocument } from "./schemas/user.schema";
+import { PublicUserDto } from "./types/user";
 
 @Injectable()
 export class AuthService {
@@ -515,5 +516,32 @@ export class AuthService {
       exp: Math.floor(Date.now() / 1000) + 15 * 60,
     };
     return this.signToken(payload, secret);
+  }
+
+  // USER
+
+  async getUserById(userId: string): Promise<PublicUserDto | null> {
+    const oid = new Types.ObjectId(userId.trim());
+    if (!oid) return null;
+
+    const user = await this.userModel.findById(oid).lean().exec();
+    if (!user) return null;
+
+    return {
+      id: String(user._id),
+      email: user.email,
+      emailVerified: user.emailVerified,
+      role: user.role,
+      username: user.username,
+      avatarUrl: user.avatarUrl,
+      bio: user.bio,
+      accountStatus: user.accountStatus,
+      walletAddress: user.walletAddress,
+      walletVerified: user.walletVerified,
+      onboardingCompleted: user.onboardingCompleted,
+      creatorAgreementAccepted: user.creatorAgreementAccepted,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    };
   }
 }

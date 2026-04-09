@@ -17,7 +17,7 @@ import { getUserId } from "src/common/helpers/auth";
 import type { AuthenticatedUser } from "src/common/types/auth-user";
 import type { Request as ExpressRequest } from "express";
 
-@Controller("billing/purchases")
+@Controller("purchases")
 export class PurchasesController {
   constructor(private readonly purchasesService: PurchasesService) {}
 
@@ -346,27 +346,6 @@ export class PurchasesController {
   //   };
   // }
 
-  // @Post("video-playback-initiated")
-  // @HttpCode(HttpStatus.OK)
-  // @UseGuards(InternalAuthGuard)
-  // async markVideoPlaybackInitiated(
-  //   @Request() req,
-  //   @Body() body: { projectId: string; videoPlaybackUrl: string },
-  // ) {
-  //   const userId = getUserId(req);
-
-  //   const result = await this.purchasesService.markVideoPlaybackInitiated(
-  //     userId,
-  //     body.projectId,
-  //     body.videoPlaybackUrl,
-  //   );
-
-  //   return {
-  //     success: true,
-  //     data: result,
-  //   };
-  // }
-
   // @Post("eligible-for-refund")
   // @HttpCode(HttpStatus.OK)
   // @UseGuards(InternalAuthGuard)
@@ -382,7 +361,6 @@ export class PurchasesController {
   // /// ----------------------------- INTERNAL SERVICE-TO-SERVICE ENDPOINTS -----------------------------
   // ///
 
-  // @UseGuards(ServiceToServiceGuard)
   // @Get("access/internal")
   // @HttpCode(HttpStatus.OK)
   // async getPurchaseAccessInternal(
@@ -403,7 +381,6 @@ export class PurchasesController {
   //   };
   // }
 
-  // @UseGuards(ServiceToServiceGuard)
   // @Post("update-access/internal")
   // @HttpCode(HttpStatus.OK)
   // async updatePurchaseAccessInternal(@Body() body: { purchaseId: string }) {

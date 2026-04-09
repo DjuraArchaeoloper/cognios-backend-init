@@ -3,25 +3,31 @@ import {
   ExecutionContext,
   ForbiddenException,
   Injectable,
+  UnauthorizedException,
 } from "@nestjs/common";
-import type { AuthenticatedUser } from "../types/auth-user";
-import { RoleName } from "src/auth/auth.types";
+import { RoleName } from "src/auth/types/auth.types";
+import { AuthService } from "src/auth/auth.service";
 
 @Injectable()
 export class AdminGuard implements CanActivate {
-  canActivate(context: ExecutionContext): boolean {
-    const request = context.switchToHttp().getRequest();
-    const authUser = request.authUser as AuthenticatedUser | undefined;
-    const headerRole = request.headers["x-user-role"];
-    const role =
-      authUser?.role ??
-      (typeof headerRole === "string" ? (headerRole as RoleName) : undefined);
+  constructor(private readonly authService: AuthService) {}
 
-    if (!role) throw new ForbiddenException("Admin access required");
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const req = context.switchToHttp().getRequest();
+    const secret = this.authService.getSecretOrNull();
+    if (!secret) throw new UnauthorizedException("Unauthorized");
 
-    if (role !== RoleName.ADMIN)
-      throw new ForbiddenException("Unauthorized access");
+    const raw = this.authService.getSessionTokenFromCookieHeader(
+      req.headers.cookie,
+    );
+    if (!raw) throw new UnauthorizedException("Unauthorized");
 
+    const payload = this.authService.readSessionToken(raw, secret);
+    if (!payload?.sub) throw new UnauthorizedException("Unauthorized");
+
+    const user = await this.authService.findUserById(payload.sub);
+    if (!user) throw new UnauthorizedException("Unauthorized");
+    if (user.role !== RoleName.ADMIN) throw new ForbiddenException("Forbidden");
     return true;
   }
 }

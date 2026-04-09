@@ -50,26 +50,6 @@ export class ProjectsAdminController {
   //   });
   // }
 
-  // @Get("link-reports")
-  // @HttpCode(HttpStatus.OK)
-  // async getAllProjectLinkReports(
-  //   @Query("page") page = 1,
-  //   @Query("limit") limit = 20,
-  //   @Query("sortBy") sortBy = "createdAt",
-  //   @Query("sortOrder") sortOrder: "asc" | "desc" = "desc",
-  //   @Query("status") status?: ProjectLinkReportStatus,
-  //   @Query("reason") reason?: ProjectLinkReportReason,
-  // ) {
-  //   return await this.projectsService.findAdminProjectLinkReports({
-  //     page: Number(page),
-  //     limit: Number(limit),
-  //     sortBy,
-  //     sortOrder,
-  //     status,
-  //     reason,
-  //   });
-  // }
-
   // @Patch(":id/status")
   // async updateProjectStatus(
   //   @Param("id") projectId: string,
@@ -91,36 +71,6 @@ export class ProjectsAdminController {
   //   @Body() body: { status: ProjectReportStatus },
   // ) {
   //   const report = await this.projectsService.takeProjectReportAction(
-  //     reportId,
-  //     body.status,
-  //   );
-  //   return {
-  //     success: true,
-  //     data: report,
-  //   };
-  // }
-
-  // @Patch(":id/disable-link")
-  // async disableLink(
-  //   @Param("id") projectId: string,
-  //   @Body() body: { linkItemId: string; linkType: ProjectLinkType },
-  // ) {
-  //   await this.projectsService.disableLink(
-  //     projectId,
-  //     body.linkItemId,
-  //     body.linkType,
-  //   );
-  //   return {
-  //     success: true,
-  //   };
-  // }
-
-  // @Patch("link-reports/:id/action")
-  // async takeProjectLinkReportAction(
-  //   @Param("id") reportId: string,
-  //   @Body() body: { status: ProjectLinkReportStatus },
-  // ) {
-  //   const report = await this.projectsService.takeProjectLinkReportAction(
   //     reportId,
   //     body.status,
   //   );

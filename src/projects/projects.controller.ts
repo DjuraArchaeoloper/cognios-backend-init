@@ -245,7 +245,6 @@ export class ProjectsController {
   // /// ----------------------------- INTERNAL SERVICE-TO-SERVICE ENDPOINTS -----------------------------
   // ///
 
-  // @UseGuards(ServiceToServiceGuard)
   // @Get(":projectId/internal")
   // async getProjectForPurchase(@Param("projectId") projectId: string) {
   //   const project = await this.projectsService.getProjectForPurchase(projectId);
@@ -257,7 +256,6 @@ export class ProjectsController {
 
   // @Post(":id/purchase/internal")
   // @HttpCode(HttpStatus.OK)
-  // @UseGuards(ServiceToServiceGuard)
   // async incrementPurchaseCount(@Param("id") id: string) {
   //   await this.projectsService.incrementPurchaseCount(id);
   //   return {
@@ -267,7 +265,6 @@ export class ProjectsController {
   // }
 
   // @Get("creator/:creatorId/public/internal")
-  // @UseGuards(ServiceToServiceGuard)
   // async getPublicProjectsByCreator(@Param("creatorId") creatorId: string) {
   //   const projects = await this.projectsService.getPublicProjectsByCreator(creatorId);
   //   return {

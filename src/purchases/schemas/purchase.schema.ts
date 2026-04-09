@@ -98,7 +98,3 @@ PurchaseSchema.index(
     },
   },
 );
-
-PurchaseSchema.index({ txSignature: 1 }, { unique: true, sparse: true });
-PurchaseSchema.index({ mintTxSignature: 1 }, { unique: true, sparse: true });
-PurchaseSchema.index({ nftMint: 1 }, { unique: true, sparse: true });

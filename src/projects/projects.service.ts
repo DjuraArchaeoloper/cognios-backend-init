@@ -9,7 +9,6 @@ import { Model, Types } from "mongoose";
 import { ConfigService } from "@nestjs/config";
 import { HttpService } from "@nestjs/axios";
 import { firstValueFrom } from "rxjs";
-import { LinkReport, LinkReportDocument } from "./schemas/link-report.schema";
 import { sanitizeHtml } from "./utils/sanitization";
 import {
   ACCESS_LEVEL,
@@ -19,7 +18,6 @@ import {
   ProjectResponse,
 } from "./types/projects";
 import { slugify } from "./utils/slug";
-import { PurchaseInterface } from "./types/purchase";
 import { convertSolToLamports } from "./utils/pricing";
 import { Project, ProjectDocument } from "./schemas/project.schema";
 import {
@@ -27,36 +25,41 @@ import {
   ProjectReportDocument,
 } from "./schemas/project-report.schema";
 import { CreateProjectDto } from "./dto/create-project.dto";
-import { PublicUserDto, UsersService } from "src/users/users.service";
-import { AccountStatus, RoleName } from "src/auth/auth.types";
+import { PublicUserDto } from "src/auth/types/user";
+import { AccountStatus, RoleName } from "src/auth/types/auth.types";
 import {
   FileMedia,
   FileMediaDocument,
-} from "src/file/schemas/file-media.schema";
-import { FILE_PROVIDER, FILE_PURPOSE, FILE_STATUS } from "src/file/types/types";
+} from "src/media/schemas/file-media.schema";
+import {
+  FILE_PROVIDER,
+  FILE_PURPOSE,
+  FILE_STATUS,
+} from "src/media/types/types";
 import {
   ImageMedia,
   ImageMediaDocument,
-} from "src/image/schemas/image-media.schema";
+} from "src/media/schemas/image-media.schema";
 import {
   IMAGE_PROVIDER,
   IMAGE_PURPOSE,
   IMAGE_STATUS,
-} from "src/image/types/types";
+} from "src/media/types/types";
 import {
   VideoMedia,
   VideoMediaDocument,
-} from "src/video/schemas/video-media.schema";
+} from "src/media/schemas/video-media.schema";
 import {
   VIDEO_PROVIDER,
   VIDEO_PURPOSE,
   VIDEO_STATUS,
-} from "src/video/types/types";
-import { RoleType } from "src/common/types";
+} from "src/media/types/types";
 import { CategoryService } from "src/category/category.service";
 import { PurchasesService } from "src/purchases/purchases.service";
 import { MediaService } from "src/media/media.service";
 import { UpdateProjectDto } from "./dto/update-project.dto";
+import { AuthService } from "src/auth/auth.service";
+import { PurchaseInterface } from "src/purchases/types/types";
 
 const ALLOWED_PRICES = [7, 12, 19, 29, 49];
 
@@ -72,8 +75,6 @@ export class ProjectsService {
   constructor(
     @InjectModel(Project.name)
     private projectModel: Model<ProjectDocument>,
-    @InjectModel(LinkReport.name)
-    private linkReportModel: Model<LinkReportDocument>,
     @InjectModel(ProjectReport.name)
     private projectReportModel: Model<ProjectReportDocument>,
     @InjectModel(FileMedia.name)
@@ -84,7 +85,7 @@ export class ProjectsService {
     private videoMediaModel: Model<VideoMediaDocument>,
     private configService: ConfigService,
     private httpService: HttpService,
-    private userService: UsersService,
+    private authService: AuthService,
     private categoryService: CategoryService,
     private purchasesService: PurchasesService,
     private mediaService: MediaService,
@@ -125,7 +126,7 @@ export class ProjectsService {
 
     const response = await firstValueFrom(
       this.httpService.get(
-        `${this.fileServiceUrl}/video/${videoUID}/internal`,
+        `${this.fileServiceUrl}/media/${videoUID}/internal`,
         {
           headers: {
             "x-internal-secret": internalSecret,
@@ -210,7 +211,7 @@ export class ProjectsService {
 
     const response = await firstValueFrom(
       this.httpService.post(
-        `${this.billingServiceUrl}/billing/purchases/update-access/internal`,
+        `${this.billingServiceUrl}/purchases/update-access/internal`,
         { purchaseId },
         {
           headers: {
@@ -276,7 +277,7 @@ export class ProjectsService {
   }
 
   private async fetchUserData(userId: string): Promise<PublicUserDto | null> {
-    const user = await this.userService.getUserById(userId);
+    const user = await this.authService.getUserById(userId);
 
     if (!user) throw new NotFoundException(`User with ID ${userId} not found`);
 
@@ -567,7 +568,7 @@ export class ProjectsService {
     user: { id: string | null; role?: string | null } | null,
   ): Promise<ProjectInterface> {
     if (!user?.id) throw new NotFoundException(`User ID is required`);
-    if (user && user.role !== RoleType.CREATOR)
+    if (user && user.role !== RoleName.CREATOR)
       throw new ForbiddenException({
         code: "FORBIDDEN",
         title: "Unauthorized",
@@ -1134,33 +1135,6 @@ export class ProjectsService {
   //   return true;
   // }
 
-  // async reportLink(
-  //   projectId: string,
-  //   dto: ReportLinkDto,
-  //   userId: string,
-  // ): Promise<boolean> {
-  //   const project = await this.projectModel.findById(projectId).exec();
-  //   if (!project)
-  //     throw new NotFoundException(`Project with ID ${projectId} not found`);
-
-  //   if (project.creatorId?.toString() === userId)
-  //     throw new ForbiddenException("You cannot report your own project.");
-
-  //   const report = new this.linkReportModel({
-  //     projectId: new Types.ObjectId(projectId),
-  //     linkItemId: new Types.ObjectId(dto.linkItemId),
-  //     linkType: dto.linkType,
-  //     link: dto.link,
-  //     userId: new Types.ObjectId(userId),
-  //     reason: dto.reason,
-  //     reportedAt: new Date(),
-  //   });
-
-  //   const savedReport = await report.save();
-  //   if (!savedReport) return false;
-  //   return true;
-  // }
-
   // getAllProjects(categoryId?: string): Promise<ProjectDocument[]> {
   //   const query: any = {};
   //   if (categoryId) {
@@ -1252,43 +1226,6 @@ export class ProjectsService {
   //         },
   //       },
 
-  //       {
-  //         $lookup: {
-  //           from: "project_link_reports",
-  //           let: { projectId: "$_id" },
-  //           pipeline: [
-  //             {
-  //               $match: {
-  //                 $expr: { $eq: ["$projectId", "$$projectId"] },
-  //                 status: ProjectLinkReportStatus.ACCEPTED,
-  //               },
-  //             },
-  //             {
-  //               $group: {
-  //                 _id: "$linkItemId",
-  //                 count: { $sum: 1 },
-  //               },
-  //             },
-  //           ],
-  //           as: "acceptedLinkReportStats",
-  //         },
-  //       },
-
-  //       {
-  //         $addFields: {
-  //           acceptedLinkReportStats: {
-  //             $map: {
-  //               input: "$acceptedLinkReportStats",
-  //               as: "stat",
-  //               in: {
-  //                 linkItemId: "$$stat._id",
-  //                 count: "$$stat.count",
-  //               },
-  //             },
-  //           },
-  //         },
-  //       },
-
   //       { $sort: sort },
   //       { $skip: skip },
   //       { $limit: limit },
@@ -1358,55 +1295,6 @@ export class ProjectsService {
   //   };
   // }
 
-  // async findAdminProjectLinkReports({
-  //   page,
-  //   limit,
-  //   sortBy,
-  //   sortOrder,
-  //   status,
-  //   reason,
-  // }: {
-  //   page: number;
-  //   limit: number;
-  //   sortBy: string;
-  //   sortOrder: "asc" | "desc";
-  //   status?: ProjectLinkReportStatus;
-  //   reason?: ProjectLinkReportReason;
-  // }) {
-  //   const query: any = {};
-
-  //   if (status) query["status"] = status;
-  //   if (reason) query["reason"] = reason;
-
-  //   const sort: any = {};
-  //   sort[sortBy === "createdAt" ? "createdAt" : "createdAt"] =
-  //     sortOrder === "asc" ? -1 : 1;
-
-  //   const skip = (page - 1) * limit;
-
-  //   const [reports, total] = await Promise.all([
-  //     this.projectLinkReportModel
-  //       .find(query)
-  //       .sort(sort)
-  //       .skip(skip)
-  //       .populate("projectId", "title description slug")
-  //       .limit(limit)
-  //       .lean(),
-  //     this.projectLinkReportModel.countDocuments(query),
-  //   ]);
-
-  //   return {
-  //     success: true,
-  //     data: reports,
-  //     meta: {
-  //       page,
-  //       limit,
-  //       total,
-  //       totalPages: Math.ceil(total / limit),
-  //     },
-  //   };
-  // }
-
   // async updateProjectStatus(projectId: string, status: PROJECT_STATUS) {
   //   const project = await this.projectModel
   //     .findByIdAndUpdate(projectId, { status }, { new: true })
@@ -1451,40 +1339,6 @@ export class ProjectsService {
   //       arrayFilters: [{ "elem._id": new Types.ObjectId(linkItemId) }],
   //     },
   //   );
-  // }
-
-  // async takeProjectLinkReportAction(
-  //   reportId: string,
-  //   status: ProjectLinkReportStatus,
-  // ): Promise<ProjectLinkReportDocument> {
-  //   const report = await this.projectLinkReportModel.findById(reportId);
-
-  //   if (!report) throw new NotFoundException("Project link report not found");
-
-  //   if (report.status === status) return report;
-
-  //   report.status = status;
-  //   await report.save();
-
-  //   if (status === ProjectLinkReportStatus.ACCEPTED) {
-  //     const FLAG_THRESHOLD = 5;
-
-  //     const acceptedCount = await this.projectLinkReportModel.countDocuments({
-  //       projectId: report.projectId,
-  //       linkItemId: report.linkItemId,
-  //       status: ProjectLinkReportStatus.ACCEPTED,
-  //     });
-
-  //     if (acceptedCount >= FLAG_THRESHOLD) {
-  //       await this.disableLink(
-  //         report.projectId.toString(),
-  //         report.linkItemId.toString(),
-  //         report.linkType,
-  //       );
-  //     }
-  //   }
-
-  //   return report;
   // }
 
   // ///

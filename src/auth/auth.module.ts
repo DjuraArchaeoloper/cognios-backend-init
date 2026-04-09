@@ -4,7 +4,6 @@ import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
 import { User, UserSchema } from "./schemas/user.schema";
 import { WalletController } from "./wallet.controller";
-import { CreatorOnboardingController } from "./creator-onboarding.controller";
 
 @Global()
 @Module({
@@ -13,7 +12,7 @@ import { CreatorOnboardingController } from "./creator-onboarding.controller";
       { name: User.name, schema: UserSchema, collection: "users" },
     ]),
   ],
-  controllers: [AuthController, WalletController, CreatorOnboardingController],
+  controllers: [AuthController, WalletController],
   providers: [AuthService],
   exports: [AuthService],
 })

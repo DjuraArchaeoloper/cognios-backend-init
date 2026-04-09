@@ -9,7 +9,6 @@ import {
   MarketplaceListingSchema,
 } from "./schemas/marketplace-listing.schema";
 import { RefundsModule } from "src/refunds/refunds.module";
-import { PurchasesAdminController } from "./purchases.admin.controller";
 import { Project, ProjectSchema } from "src/projects/schemas/project.schema";
 
 @Module({
@@ -22,7 +21,7 @@ import { Project, ProjectSchema } from "src/projects/schemas/project.schema";
     HttpModule,
     forwardRef(() => RefundsModule),
   ],
-  controllers: [PurchasesController, PurchasesAdminController],
+  controllers: [PurchasesController],
   providers: [PurchasesService],
   exports: [PurchasesService],
 })
