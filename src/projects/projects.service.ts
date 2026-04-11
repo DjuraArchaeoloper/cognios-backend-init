@@ -61,7 +61,7 @@ import { UpdateProjectDto } from "./dto/update-project.dto";
 import { AuthService } from "src/auth/auth.service";
 import { PurchaseInterface } from "src/purchases/types/types";
 
-const ALLOWED_PRICES = [7, 12, 19, 29, 49];
+const ALLOWED_PRICES = [1, 5, 7, 10, 25];
 
 @Injectable()
 export class ProjectsService {
